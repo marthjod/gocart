@@ -12,14 +12,15 @@ import (
 
 func main() {
 	var (
-		err        error
-		verbose    bool
-		elapsed    time.Duration
-		vmPoolFile string
+		err          error
+		verbose      bool
+		elapsed      time.Duration
+		vmPoolFile   string
 		hostPoolFile string
-		xmlFile    *os.File
-		vmPool     *ocatypes.VmPool
-		hostPool *ocatypes.HostPool
+		poolFile     string
+		xmlFile      *os.File
+		vmPool       *ocatypes.VmPool
+		hostPool     *ocatypes.HostPool
 	)
 
 	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
@@ -27,27 +28,33 @@ func main() {
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.Parse()
 
-	if vmPoolFile == "" && hostPoolFile == "" {
+	if vmPoolFile == "" && hostPoolFile == "" || vmPoolFile != "" && hostPoolFile != "" {
 		flag.PrintDefaults()
+		return
+	}
+
+	if vmPoolFile != "" {
+		poolFile = vmPoolFile
+	} else if hostPoolFile != "" {
+		poolFile = hostPoolFile
+	}
+
+	xmlFile, err = os.Open(poolFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer xmlFile.Close()
+
+	data, err := ioutil.ReadAll(xmlFile)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	if vmPoolFile != "" {
 
 		vmPool = ocatypes.NewVmPool()
-
-		xmlFile, err = os.Open(vmPoolFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer xmlFile.Close()
-
-		data, err := ioutil.ReadAll(xmlFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
 
 		if elapsed, err = vmPool.Read(data); err != nil {
 			fmt.Println("Error during unmarshaling:", err)
@@ -63,24 +70,9 @@ func main() {
 			}
 		}
 
-
-	} else {
-
+	} else if hostPoolFile != "" {
 
 		hostPool = ocatypes.NewHostPool()
-
-		xmlFile, err = os.Open(hostPoolFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer xmlFile.Close()
-
-		data, err := ioutil.ReadAll(xmlFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
 
 		if elapsed, err = hostPool.Read(data); err != nil {
 			fmt.Println("Error during unmarshaling:", err)
@@ -92,11 +84,7 @@ func main() {
 			for i := 0; i < len(hostPool.Hosts); i++ {
 				host := hostPool.Hosts[i]
 				fmt.Printf("%v %v\n", host.Id, host.Template.Datacenter)
-
-				// fmt.Printf("%v %v", )
 			}
 		}
-
 	}
-
 }
