@@ -18,6 +18,7 @@ type Template struct {
 	Name    string   `xml:"NAME"`
 	Nics    []Nic    `xml:"NIC"`
 	VCpu    string   `xml:"VCPU"`
+	Datacenter string `xml:"DATACENTER"`
 }
 
 type VmTemplate struct {
@@ -45,9 +46,20 @@ type Vm struct {
 	Template Template `xml:"TEMPLATE"`
 }
 
+type Host struct {
+	XMLName xml.Name `xml:"HOST"`
+	Id int `xml:"ID"`
+	Template Template `xml:"TEMPLATE"`
+}
+
 type VmPool struct {
 	XMLName xml.Name `xml:"VM_POOL"`
 	Vms     []Vm     `xml:"VM"` // ?
+}
+
+type HostPool struct {
+	XMLName xml.Name `xml:"HOST_POOL"`
+	Hosts []Host `xml:"HOST"`
 }
 
 func NewVmPool() *VmPool {
@@ -55,7 +67,12 @@ func NewVmPool() *VmPool {
 	return p
 }
 
-func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
+func NewHostPool() *HostPool {
+	p := new(HostPool)
+	return p
+}
+
+func read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) {
 	var (
 		err     error
 		start   time.Time
@@ -63,8 +80,28 @@ func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
 	)
 
 	start = time.Now()
-	err = xml.Unmarshal(xmlData, &vmPool)
+	err = xml.Unmarshal(xmlData, &pool)
 	elapsed = time.Since(start)
 
+	return pool, elapsed, err
+}
+
+func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
+	var (
+		err error
+		elapsed time.Duration
+	)
+
+	_, elapsed, err = read(xmlData, vmPool)
+	return elapsed, err
+}
+
+func (hostPool *HostPool) Read(xmlData []byte) (time.Duration, error) {
+	var (
+		err     error
+		elapsed time.Duration
+	)
+
+	_, elapsed, err = read(xmlData, hostPool)
 	return elapsed, err
 }
