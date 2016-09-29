@@ -11,14 +11,14 @@ type Nic struct {
 }
 
 type Template struct {
-	XMLName xml.Name `xml:"TEMPLATE"`
-	Cpu     string   `xml:"CPU"`
-	Disk    string   `xml:"DISK"`
-	Memory  string   `xml:"MEMORY"`
-	Name    string   `xml:"NAME"`
-	Nics    []Nic    `xml:"NIC"`
-	VCpu    string   `xml:"VCPU"`
-	Datacenter string `xml:"DATACENTER"`
+	XMLName    xml.Name `xml:"TEMPLATE"`
+	Cpu        string   `xml:"CPU"`
+	Disk       string   `xml:"DISK"`
+	Memory     string   `xml:"MEMORY"`
+	Name       string   `xml:"NAME"`
+	Nics       []Nic    `xml:"NIC"`
+	VCpu       string   `xml:"VCPU"`
+	Datacenter string   `xml:"DATACENTER"`
 }
 
 type VmTemplate struct {
@@ -47,9 +47,12 @@ type Vm struct {
 }
 
 type Host struct {
-	XMLName xml.Name `xml:"HOST"`
-	Id int `xml:"ID"`
-	Template Template `xml:"TEMPLATE"`
+	XMLName   xml.Name `xml:"HOST"`
+	Id        int      `xml:"ID"`
+	Name      string   `xml:"NAME"`
+	Cluster   string   `xml:"CLUSTER"`
+	ClusterId int      `xml:"CLUSTER_ID"`
+	Template  Template `xml:"TEMPLATE"`
 }
 
 type VmPool struct {
@@ -57,22 +60,12 @@ type VmPool struct {
 	Vms     []Vm     `xml:"VM"` // ?
 }
 
-type HostPool struct {
-	XMLName xml.Name `xml:"HOST_POOL"`
-	Hosts []Host `xml:"HOST"`
-}
-
 func NewVmPool() *VmPool {
 	p := new(VmPool)
 	return p
 }
 
-func NewHostPool() *HostPool {
-	p := new(HostPool)
-	return p
-}
-
-func read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) {
+func Read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) {
 	var (
 		err     error
 		start   time.Time
@@ -88,20 +81,10 @@ func read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) 
 
 func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
 	var (
-		err error
-		elapsed time.Duration
-	)
-
-	_, elapsed, err = read(xmlData, vmPool)
-	return elapsed, err
-}
-
-func (hostPool *HostPool) Read(xmlData []byte) (time.Duration, error) {
-	var (
 		err     error
 		elapsed time.Duration
 	)
 
-	_, elapsed, err = read(xmlData, hostPool)
+	_, elapsed, err = Read(xmlData, vmPool)
 	return elapsed, err
 }

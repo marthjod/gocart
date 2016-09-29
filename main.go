@@ -1,11 +1,11 @@
-// main.go
 package main
 
 import (
 	"flag"
 	"fmt"
+	"gocart/ocahostpool"
+	"gocart/ocatypes"
 	"io/ioutil"
-	"ocatypes"
 	"os"
 	"time"
 )
@@ -17,14 +17,16 @@ func main() {
 		elapsed      time.Duration
 		vmPoolFile   string
 		hostPoolFile string
+		cluster      string
 		poolFile     string
 		xmlFile      *os.File
 		vmPool       *ocatypes.VmPool
-		hostPool     *ocatypes.HostPool
+		hostPool     *ocahostpool.HostPool
 	)
 
 	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
 	flag.StringVar(&hostPoolFile, "host-pool", "", `Host pool XML dump file path`)
+	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.Parse()
 
@@ -72,7 +74,7 @@ func main() {
 
 	} else if hostPoolFile != "" {
 
-		hostPool = ocatypes.NewHostPool()
+		hostPool = ocahostpool.NewHostPool()
 
 		if elapsed, err = hostPool.Read(data); err != nil {
 			fmt.Println("Error during unmarshaling:", err)
