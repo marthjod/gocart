@@ -9,16 +9,8 @@ import (
 )
 
 type VmPool struct {
-	XMLName xml.Name `xml:"VM_POOL"`
-	Vms     []*Vm    `xml:"VM"`
-}
-
-type Vm struct {
-	ocatypes.Vm
-}
-
-func (vm Vm) String() string {
-	return vm.Name
+	XMLName xml.Name       `xml:"VM_POOL"`
+	Vms     []*ocatypes.Vm `xml:"VM"`
 }
 
 func NewVmPool() *VmPool {
@@ -36,7 +28,7 @@ func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
 	return elapsed, err
 }
 
-func (vmPool *VmPool) GetVmById(ids ...int) *VmPool {
+func (vmPool *VmPool) GetVmsById(ids ...int) *VmPool {
 	var (
 		pool VmPool
 	)
@@ -50,7 +42,7 @@ func (vmPool *VmPool) GetVmById(ids ...int) *VmPool {
 	return &pool
 }
 
-func (vmPool *VmPool) GetVmByName(matchPattern string) (*VmPool, error) {
+func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
 	var pool VmPool
 	for _, vm := range vmPool.Vms {
 		match, err := regexp.MatchString(matchPattern, vm.Name)

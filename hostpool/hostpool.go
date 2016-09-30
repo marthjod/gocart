@@ -46,7 +46,7 @@ func (hostPool *HostPool) GetHostsInCluster(cluster string) *HostPool {
 }
 
 func (host *Host) MapVms(vmpool *vmpool.VmPool) {
-	host.VmPool = vmpool.GetVmById(host.VmIds...)
+	host.VmPool = vmpool.GetVmsById(host.VmIds...)
 }
 
 func (hostPool *HostPool) MapVms(vmpool *vmpool.VmPool) {

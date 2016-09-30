@@ -32,18 +32,18 @@ func main() {
 	flag.Parse()
 
 	xmlHostFile, err = os.Open(hostPoolFile)
+	defer xmlHostFile.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer xmlHostFile.Close()
 
 	xmlVmFile, err = os.Open(vmPoolFile)
+	defer xmlVmFile.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer xmlVmFile.Close()
 
 	hostdata, err := ioutil.ReadAll(xmlHostFile)
 	if err != nil {
@@ -98,7 +98,7 @@ func main() {
 		fmt.Printf("# of vms: %d\n", len(h.VmPool.Vms))
 	}
 
-	billingVms, err := vmPool.GetVmByName("^bil_.+")
+	billingVms, err := vmPool.GetVmsByName("^bil_.+")
 	if err != nil {
 		fmt.Println(err)
 		return
