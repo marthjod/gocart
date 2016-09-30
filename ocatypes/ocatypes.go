@@ -35,15 +35,25 @@ type VmTemplate struct {
 }
 
 type Vm struct {
-	XMLName  xml.Name `xml:"VM"`
-	Id       int      `xml:"ID"`
-	Name     string   `xml:"NAME"`
-	Cpu      int      `xml:"CPU"`
-	LastPoll int      `xml:"LAST_POLL"`
-	LCMState int      `xml:"LCM_STATE"`
-	Resched  int      `xml:"RESCHED"`
-	DeployId string   `xml:"DEPLOY_ID"`
-	Template Template `xml:"TEMPLATE"`
+	XMLName      xml.Name     `xml:"VM"`
+	Id           int          `xml:"ID"`
+	Name         string       `xml:"NAME"`
+	Cpu          int          `xml:"CPU"`
+	LastPoll     int          `xml:"LAST_POLL"`
+	LCMState     int          `xml:"LCM_STATE"`
+	Resched      int          `xml:"RESCHED"`
+	DeployId     string       `xml:"DEPLOY_ID"`
+	Template     Template     `xml:"TEMPLATE"`
+	UserTemplate UserTemplate `xml:"USER_TEMPLATE"`
+}
+
+type UserTemplate struct {
+	Items []Tag `xml:",any"`
+}
+
+type Tag struct {
+	XMLName xml.Name
+	Content string `xml:",innerxml"`
 }
 
 type Host struct {

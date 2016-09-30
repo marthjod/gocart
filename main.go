@@ -107,6 +107,10 @@ func main() {
 	fmt.Println("showing all billing vms")
 	for _, bvm := range billingVms.Vms {
 		fmt.Println(bvm.Name)
-	}
+		fmt.Println("User Template:")
+		for _, v := range bvm.UserTemplate.Items {
+			fmt.Printf("%s = %s\n", v.XMLName.Local, v.Content)
+		}
 
+	}
 }
