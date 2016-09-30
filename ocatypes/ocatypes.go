@@ -53,16 +53,12 @@ type Host struct {
 	Cluster   string   `xml:"CLUSTER"`
 	ClusterId int      `xml:"CLUSTER_ID"`
 	Template  Template `xml:"TEMPLATE"`
+	VmIds     []int    `xml:"VMS>ID"`
 }
 
 type VmPool struct {
 	XMLName xml.Name `xml:"VM_POOL"`
 	Vms     []Vm     `xml:"VM"` // ?
-}
-
-func NewVmPool() *VmPool {
-	p := new(VmPool)
-	return p
 }
 
 func Read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) {
@@ -77,14 +73,4 @@ func Read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) 
 	elapsed = time.Since(start)
 
 	return pool, elapsed, err
-}
-
-func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
-	var (
-		err     error
-		elapsed time.Duration
-	)
-
-	_, elapsed, err = Read(xmlData, vmPool)
-	return elapsed, err
 }

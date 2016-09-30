@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gocart/ocahostpool"
-	"gocart/ocatypes"
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/marthjod/gocart/hostpool"
+	"github.com/marthjod/gocart/vmpool"
 )
 
 func main() {
@@ -18,10 +19,10 @@ func main() {
 		vmPoolFile   string
 		hostPoolFile string
 		cluster      string
-		poolFile     string
-		xmlFile      *os.File
-		vmPool       *ocatypes.VmPool
-		hostPool     *ocahostpool.HostPool
+		xmlHostFile  *os.File
+		xmlVmFile    *os.File
+		vmPool       *vmpool.VmPool
+		hostPool     *hostpool.HostPool
 	)
 
 	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
@@ -30,63 +31,82 @@ func main() {
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.Parse()
 
-	if vmPoolFile == "" && hostPoolFile == "" || vmPoolFile != "" && hostPoolFile != "" {
-		flag.PrintDefaults()
-		return
-	}
-
-	if vmPoolFile != "" {
-		poolFile = vmPoolFile
-	} else if hostPoolFile != "" {
-		poolFile = hostPoolFile
-	}
-
-	xmlFile, err = os.Open(poolFile)
+	xmlHostFile, err = os.Open(hostPoolFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer xmlFile.Close()
+	defer xmlHostFile.Close()
 
-	data, err := ioutil.ReadAll(xmlFile)
+	xmlVmFile, err = os.Open(vmPoolFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer xmlVmFile.Close()
+
+	hostdata, err := ioutil.ReadAll(xmlHostFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if vmPoolFile != "" {
+	vmdata, err := ioutil.ReadAll(xmlVmFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-		vmPool = ocatypes.NewVmPool()
+	vmPool = vmpool.NewVmPool()
 
-		if elapsed, err = vmPool.Read(data); err != nil {
-			fmt.Println("Error during unmarshaling:", err)
-			return
-		}
+	if elapsed, err = vmPool.Read(vmdata); err != nil {
+		fmt.Println("Error during unmarshaling:", err)
+		return
+	}
 
-		fmt.Printf("Read in VM pool of length %v in %v\n", len(vmPool.Vms), elapsed)
-		if verbose {
-			for i := 0; i < len(vmPool.Vms); i++ {
-				vm := vmPool.Vms[i]
-				fmt.Printf("%v %v (CPU: %v, template/mem: %v)\n",
-					vm.Id, vm.Name, vm.Cpu, vm.Template.Memory)
-			}
-		}
-
-	} else if hostPoolFile != "" {
-
-		hostPool = ocahostpool.NewHostPool()
-
-		if elapsed, err = hostPool.Read(data); err != nil {
-			fmt.Println("Error during unmarshaling:", err)
-			return
-		}
-
-		fmt.Printf("Read in host pool of length %v in %v\n", len(hostPool.Hosts), elapsed)
-		if verbose {
-			for i := 0; i < len(hostPool.Hosts); i++ {
-				host := hostPool.Hosts[i]
-				fmt.Printf("%v %v\n", host.Id, host.Template.Datacenter)
-			}
+	fmt.Printf("Read in VM pool of length %v in %v\n", len(vmPool.Vms), elapsed)
+	if verbose {
+		for i := 0; i < len(vmPool.Vms); i++ {
+			vm := vmPool.Vms[i]
+			fmt.Printf("%v %v (CPU: %v, template/mem: %v)\n",
+				vm.Id, vm.Name, vm.Cpu, vm.Template.Memory)
 		}
 	}
+
+	hostPool = hostpool.NewHostPool()
+
+	if elapsed, err = hostPool.Read(hostdata); err != nil {
+		fmt.Println("Error during unmarshaling:", err)
+		return
+	}
+
+	fmt.Printf("Read in host pool of length %v in %v\n", len(hostPool.Hosts), elapsed)
+	if verbose {
+		for i := 0; i < len(hostPool.Hosts); i++ {
+			host := hostPool.Hosts[i]
+			fmt.Printf("%v %v\n", host.Id, host.Template.Datacenter)
+		}
+	}
+	clusterHosts := hostPool.GetHostsInCluster(cluster)
+	clusterHosts.MapVms(vmPool)
+
+	for _, h := range clusterHosts.Hosts {
+		fmt.Printf("Host %q has VMs\n", h.Name)
+		for _, vm := range h.VmPool.Vms {
+			fmt.Printf("%s\n", vm.Name)
+		}
+		fmt.Printf("# of vms: %d\n", len(h.VmPool.Vms))
+	}
+
+	billingVms, err := vmPool.GetVmByName("^bil_.+")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("showing all billing vms")
+	for _, bvm := range billingVms.Vms {
+		fmt.Println(bvm.Name)
+	}
+
 }
