@@ -2,23 +2,15 @@ package vmpool
 
 import (
 	"encoding/xml"
+	"io"
 	"regexp"
-	"time"
 
 	"github.com/marthjod/gocart/ocatypes"
 )
 
 type VmPool struct {
-	XMLName xml.Name `xml:"VM_POOL"`
-	Vms     []*Vm    `xml:"VM"`
-}
-
-type Vm struct {
-	ocatypes.Vm
-}
-
-func (vm Vm) String() string {
-	return vm.Name
+	XMLName xml.Name       `xml:"VM_POOL"`
+	Vms     []*ocatypes.Vm `xml:"VM"`
 }
 
 func NewVmPool() *VmPool {
@@ -26,17 +18,16 @@ func NewVmPool() *VmPool {
 	return p
 }
 
-func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
-	var (
-		err     error
-		elapsed time.Duration
-	)
-
-	_, elapsed, err = ocatypes.Read(xmlData, vmPool)
-	return elapsed, err
+func FromReader(r io.Reader) (*VmPool, error) {
+	pool := VmPool{}
+	dec := xml.NewDecoder(r)
+	if err := dec.Decode(&pool); err != nil {
+		return nil, err
+	}
+	return &pool, nil
 }
 
-func (vmPool *VmPool) GetVmById(ids ...int) *VmPool {
+func (vmPool *VmPool) GetVmsById(ids ...int) *VmPool {
 	var (
 		pool VmPool
 	)
@@ -50,7 +41,7 @@ func (vmPool *VmPool) GetVmById(ids ...int) *VmPool {
 	return &pool
 }
 
-func (vmPool *VmPool) GetVmByName(matchPattern string) (*VmPool, error) {
+func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
 	var pool VmPool
 	for _, vm := range vmPool.Vms {
 		match, err := regexp.MatchString(matchPattern, vm.Name)
