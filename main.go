@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
-	"time"
+	"runtime/pprof"
 
 	"github.com/marthjod/gocart/hostpool"
 	"github.com/marthjod/gocart/vmpool"
@@ -15,7 +15,6 @@ func main() {
 	var (
 		err          error
 		verbose      bool
-		elapsed      time.Duration
 		vmPoolFile   string
 		hostPoolFile string
 		cluster      string
@@ -23,13 +22,25 @@ func main() {
 		xmlVmFile    *os.File
 		vmPool       *vmpool.VmPool
 		hostPool     *hostpool.HostPool
+		cpuprofile   string
 	)
 
 	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
 	flag.StringVar(&hostPoolFile, "host-pool", "", `Host pool XML dump file path`)
 	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
+	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to file")
+
 	flag.Parse()
+
+	if cpuprofile != "" {
+		f, err := os.Create(cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	xmlHostFile, err = os.Open(hostPoolFile)
 	defer xmlHostFile.Close()
@@ -45,26 +56,11 @@ func main() {
 		return
 	}
 
-	hostdata, err := ioutil.ReadAll(xmlHostFile)
+	vmPool, err = vmpool.FromReader(xmlVmFile)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 
-	vmdata, err := ioutil.ReadAll(xmlVmFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	vmPool = vmpool.NewVmPool()
-
-	if elapsed, err = vmPool.Read(vmdata); err != nil {
-		fmt.Println("Error during unmarshaling:", err)
-		return
-	}
-
-	fmt.Printf("Read in VM pool of length %v in %v\n", len(vmPool.Vms), elapsed)
 	if verbose {
 		for i := 0; i < len(vmPool.Vms); i++ {
 			vm := vmPool.Vms[i]
@@ -73,14 +69,13 @@ func main() {
 		}
 	}
 
-	hostPool = hostpool.NewHostPool()
-
-	if elapsed, err = hostPool.Read(hostdata); err != nil {
-		fmt.Println("Error during unmarshaling:", err)
-		return
+	hostPool, err = hostpool.FromReader(xmlHostFile)
+	if err != nil {
+		panic(err)
 	}
 
-	fmt.Printf("Read in host pool of length %v in %v\n", len(hostPool.Hosts), elapsed)
+	hostPool.MapVms(vmPool)
+
 	if verbose {
 		for i := 0; i < len(hostPool.Hosts); i++ {
 			host := hostPool.Hosts[i]
@@ -88,7 +83,7 @@ func main() {
 		}
 	}
 	clusterHosts := hostPool.GetHostsInCluster(cluster)
-	clusterHosts.MapVms(vmPool)
+	// clusterHosts.MapVms(vmPool)
 
 	for _, h := range clusterHosts.Hosts {
 		fmt.Printf("Host %q has VMs\n", h.Name)

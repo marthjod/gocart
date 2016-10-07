@@ -2,7 +2,7 @@ package hostpool
 
 import (
 	"encoding/xml"
-	"time"
+	"io"
 
 	"github.com/marthjod/gocart/ocatypes"
 	"github.com/marthjod/gocart/vmpool"
@@ -23,19 +23,13 @@ func NewHostPool() *HostPool {
 	return p
 }
 
-/*func FromReader(r io.Reader) (*HostPool, error) {
-	hostPool := new(HostPool)
-	return ocatypes.FromReader(r, hostPool)
-}
-*/
-func (hostPool *HostPool) Read(xmlData []byte) (time.Duration, error) {
-	var (
-		err     error
-		elapsed time.Duration
-	)
-
-	_, elapsed, err = ocatypes.Read(xmlData, hostPool)
-	return elapsed, err
+func FromReader(r io.Reader) (*HostPool, error) {
+	pool := HostPool{}
+	dec := xml.NewDecoder(r)
+	if err := dec.Decode(&pool); err != nil {
+		return nil, err
+	}
+	return &pool, nil
 }
 
 func (hostPool *HostPool) GetHostsInCluster(cluster string) *HostPool {

@@ -3,8 +3,6 @@ package ocatypes
 import (
 	"encoding/xml"
 	"fmt"
-	"io"
-	"time"
 )
 
 type Nic struct {
@@ -83,26 +81,4 @@ type Host struct {
 type VmPool struct {
 	XMLName xml.Name `xml:"VM_POOL"`
 	Vms     []Vm     `xml:"VM"` // ?
-}
-
-func FromReader(r io.Reader, pool interface{}) (interface{}, error) {
-	dec := xml.NewDecoder(r)
-	if err := dec.Decode(&pool); err != nil {
-		return nil, err
-	}
-	return &pool, nil
-}
-
-func Read(xmlData []byte, pool interface{}) (interface{}, time.Duration, error) {
-	var (
-		err     error
-		start   time.Time
-		elapsed time.Duration
-	)
-
-	start = time.Now()
-	err = xml.Unmarshal(xmlData, &pool)
-	elapsed = time.Since(start)
-
-	return pool, elapsed, err
 }

@@ -2,8 +2,8 @@ package vmpool
 
 import (
 	"encoding/xml"
+	"io"
 	"regexp"
-	"time"
 
 	"github.com/marthjod/gocart/ocatypes"
 )
@@ -18,14 +18,13 @@ func NewVmPool() *VmPool {
 	return p
 }
 
-func (vmPool *VmPool) Read(xmlData []byte) (time.Duration, error) {
-	var (
-		err     error
-		elapsed time.Duration
-	)
-
-	_, elapsed, err = ocatypes.Read(xmlData, vmPool)
-	return elapsed, err
+func FromReader(r io.Reader) (*VmPool, error) {
+	pool := VmPool{}
+	dec := xml.NewDecoder(r)
+	if err := dec.Decode(&pool); err != nil {
+		return nil, err
+	}
+	return &pool, nil
 }
 
 func (vmPool *VmPool) GetVmsById(ids ...int) *VmPool {
