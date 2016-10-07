@@ -23,6 +23,11 @@ func NewHostPool() *HostPool {
 	return p
 }
 
+/*func FromReader(r io.Reader) (*HostPool, error) {
+	hostPool := new(HostPool)
+	return ocatypes.FromReader(r, hostPool)
+}
+*/
 func (hostPool *HostPool) Read(xmlData []byte) (time.Duration, error) {
 	var (
 		err     error
