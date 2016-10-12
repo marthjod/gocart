@@ -1,28 +1,28 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime/pprof"
 
+	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/hostpool"
 	"github.com/marthjod/gocart/vmpool"
 )
 
 func main() {
 	var (
-		err          error
 		verbose      bool
 		vmPoolFile   string
 		hostPoolFile string
 		cluster      string
-		xmlHostFile  *os.File
-		xmlVmFile    *os.File
-		vmPool       *vmpool.VmPool
-		hostPool     *hostpool.HostPool
 		cpuprofile   string
+		user         string
+		password     string
 	)
 
 	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
@@ -30,6 +30,8 @@ func main() {
 	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to file")
+	flag.StringVar(&user, "user", "", `OpenNebula User`)
+	flag.StringVar(&password, "password", "", `OpenNebula Password`)
 
 	flag.Parse()
 
@@ -42,22 +44,21 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	xmlHostFile, err = os.Open(hostPoolFile)
-	defer xmlHostFile.Close()
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	apiClient, err := api.NewClient("https://localhost:61443/RPC2", user, password, tr)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 
-	xmlVmFile, err = os.Open(vmPoolFile)
-	defer xmlVmFile.Close()
-	if err != nil {
-		fmt.Println(err)
-		return
+	vmPool := vmpool.NewVmPool()
+	if err := apiClient.Call(vmPool); err != nil {
+		panic(err)
 	}
 
-	vmPool, err = vmpool.FromReader(xmlVmFile)
-	if err != nil {
+	hostPool := hostpool.NewHostPool()
+	if err := apiClient.Call(hostPool); err != nil {
 		panic(err)
 	}
 
@@ -69,11 +70,6 @@ func main() {
 		}
 	}
 
-	hostPool, err = hostpool.FromReader(xmlHostFile)
-	if err != nil {
-		panic(err)
-	}
-
 	hostPool.MapVms(vmPool)
 
 	if verbose {
@@ -83,7 +79,6 @@ func main() {
 		}
 	}
 	clusterHosts := hostPool.GetHostsInCluster(cluster)
-	// clusterHosts.MapVms(vmPool)
 
 	for _, h := range clusterHosts.Hosts {
 		fmt.Printf("Host %q has VMs\n", h.Name)
@@ -103,9 +98,12 @@ func main() {
 	for _, bvm := range billingVms.Vms {
 		fmt.Println(bvm.Name)
 		fmt.Println("User Template:")
-		for _, v := range bvm.UserTemplate.Items {
-			fmt.Printf("%s = %s\n", v.XMLName.Local, v.Content)
+		acsFQDN, err := bvm.UserTemplate.Items.GetCustom("ACS_FQDN")
+		if err != nil {
+			fmt.Print(err.Error())
 		}
+		fmt.Printf("%s\n", acsFQDN)
 
 	}
+
 }

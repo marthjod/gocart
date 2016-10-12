@@ -13,6 +13,22 @@ type HostPool struct {
 	Hosts   []*Host  `xml:"HOST"`
 }
 
+// ApiMethod implements the api.Endpointer interface
+func (hostpool *HostPool) ApiMethod() string {
+	return "one.hostpool.info"
+}
+
+// ApiArgs implements the api.Endpointer interface
+// API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html#one-hostpool-info
+func (hostpool *HostPool) ApiArgs(authstring string) []interface{} {
+	return []interface{}{authstring}
+}
+
+func (hostpool *HostPool) Unmarshal(data []byte) error {
+	err := xml.Unmarshal(data, hostpool)
+	return err
+}
+
 type Host struct {
 	*ocatypes.Host
 	VmPool *vmpool.VmPool
