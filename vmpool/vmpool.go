@@ -13,6 +13,22 @@ type VmPool struct {
 	Vms     []*ocatypes.Vm `xml:"VM"`
 }
 
+// ApiMethod implements the api.Endpointer interface
+func (vmpool *VmPool) ApiMethod() string {
+	return "one.vmpool.info"
+}
+
+// ApiArgs implements the api.Endpointer interface
+// API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html#one-vmpool-info
+func (vmpool *VmPool) ApiArgs(authstring string) []interface{} {
+	return []interface{}{authstring, -2, -1, -1, -1}
+}
+
+func (vmpool *VmPool) Unmarshal(data []byte) error {
+	err := xml.Unmarshal(data, vmpool)
+	return err
+}
+
 func NewVmPool() *VmPool {
 	p := new(VmPool)
 	return p

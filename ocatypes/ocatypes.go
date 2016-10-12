@@ -54,7 +54,7 @@ type UserTemplate struct {
 
 type Tag struct {
 	XMLName xml.Name
-	Content string `xml:",innerxml"`
+	Content string `xml:",chardata"`
 }
 
 type Tags []Tag
