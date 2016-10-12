@@ -16,22 +16,20 @@ import (
 
 func main() {
 	var (
-		verbose      bool
-		vmPoolFile   string
-		hostPoolFile string
-		cluster      string
-		cpuprofile   string
-		user         string
-		password     string
+		verbose    bool
+		cluster    string
+		cpuprofile string
+		user       string
+		password   string
+		url        string
 	)
 
-	flag.StringVar(&vmPoolFile, "vm-pool", "", `VM pool XML dump file path`)
-	flag.StringVar(&hostPoolFile, "host-pool", "", `Host pool XML dump file path`)
 	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
 	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to file")
 	flag.StringVar(&user, "user", "", `OpenNebula User`)
 	flag.StringVar(&password, "password", "", `OpenNebula Password`)
+	flag.StringVar(&url, "url", "https://localhost:61443/RPC2", "OpenNebula XML-RPC API URL")
 
 	flag.Parse()
 
@@ -47,7 +45,7 @@ func main() {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	apiClient, err := api.NewClient("https://localhost:61443/RPC2", user, password, tr)
+	apiClient, err := api.NewClient(url, user, password, tr)
 	if err != nil {
 		panic(err)
 	}
