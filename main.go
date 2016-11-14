@@ -47,17 +47,20 @@ func main() {
 	}
 	apiClient, err := api.NewClient(url, user, password, tr)
 	if err != nil {
-		panic(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	vmPool := vmpool.NewVmPool()
 	if err := apiClient.Call(vmPool); err != nil {
-		panic(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	hostPool := hostpool.NewHostPool()
 	if err := apiClient.Call(hostPool); err != nil {
-		panic(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	if verbose {
