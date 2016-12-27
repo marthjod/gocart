@@ -34,6 +34,10 @@ type Host struct {
 	VmPool *vmpool.VmPool
 }
 
+func (h *Host) String() string {
+	return h.Name
+}
+
 func NewHostPool() *HostPool {
 	p := new(HostPool)
 	return p
