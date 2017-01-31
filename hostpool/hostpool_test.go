@@ -3,6 +3,7 @@ package hostpool_test
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/marthjod/gocart/hostpool"
@@ -24,6 +25,13 @@ func getFileContents(path string) []byte {
 	return f
 }
 
+func getHostPoolFromFile(path string) *hostpool.HostPool {
+	pool := hostpool.NewHostPool()
+	xml := getFileContents(path)
+	_ = pool.Unmarshal(xml)
+	return pool
+}
+
 func TestApiMethod(t *testing.T) {
 	const apiMethod = "one.hostpool.info"
 
@@ -43,7 +51,6 @@ func TestApiArgs(t *testing.T) {
 	if argsStr != expected {
 		t.Fatalf("Mismatch: %s != %s", argsStr, expected)
 	}
-
 }
 
 func TestUnmarshalValidHostpool(t *testing.T) {
@@ -71,10 +78,28 @@ func TestUnmarshalInvalidXML(t *testing.T) {
 	}
 }
 
+func TestFromReader(t *testing.T) {
+	var expected = 2
+
+	f, err := os.Open("testdata/hostpool.xml")
+	defer f.Close()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	pool, err := hostpool.FromReader(f)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if len(pool.Hosts) != expected {
+		t.Errorf("Host pool has length %d, expected %d", len(pool.Hosts), expected)
+	}
+
+}
+
 func TestGetHostsInCluster(t *testing.T) {
-	pool := hostpool.NewHostPool()
-	xml := getFileContents("testdata/hostpool.xml")
-	pool.Unmarshal(xml)
+	pool := getHostPoolFromFile("testdata/hostpool.xml")
 
 	for _, expected := range expectedPools {
 		clusterPool := pool.GetHostsInCluster(expected.cluster)
