@@ -9,7 +9,7 @@ go get -u github.com/marthjod/gocart
 ## Run tests
 
 ```
-go test -cover
+go test -cover ./...
 ```
 
 ## Run
