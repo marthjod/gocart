@@ -1,5 +1,7 @@
 # gocart
 
+[![Travis CI Build Status](https://travis-ci.org/marthjod/gocart.svg?branch=master)](https://travis-ci.org/marthjod/gocart)
+
 ## Install
 
 ```
