@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime/pprof"
+	"sort"
 
 	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/hostpool"
@@ -16,12 +17,16 @@ import (
 
 func main() {
 	var (
-		verbose    bool
-		cluster    string
-		cpuprofile string
-		user       string
-		password   string
-		url        string
+		verbose             bool
+		cluster             string
+		cpuprofile          string
+		user                string
+		password            string
+		url                 string
+		patternFilter       string
+		patternFilterPrefix string
+		patternFilterInfix  string
+		patternFilterSuffix string
 	)
 
 	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
@@ -30,6 +35,10 @@ func main() {
 	flag.StringVar(&user, "user", "", `OpenNebula User`)
 	flag.StringVar(&password, "password", "", `OpenNebula Password`)
 	flag.StringVar(&url, "url", "https://localhost:61443/RPC2", "OpenNebula XML-RPC API URL")
+	flag.StringVar(&patternFilter, "pattern-filter", "^([a-z]{2}).+([a-z]{2})$", "Regexp filter for distinct VM name pattern auto-discovery")
+	flag.StringVar(&patternFilterPrefix, "pattern-filter-prefix", "^", "Prefix for distinct VM name patterns")
+	flag.StringVar(&patternFilterInfix, "pattern-filter-infix", ".+", "Infix for distinct VM name patterns")
+	flag.StringVar(&patternFilterSuffix, "pattern-filter-suffix", "$", "Suffix for distinct VM name patterns")
 
 	flag.Parse()
 
@@ -106,5 +115,10 @@ func main() {
 		fmt.Printf("%s\n", acsFQDN)
 
 	}
+
+	distinctPattterns := vmPool.GetDistinctVmNamePatterns(
+		patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
+	sort.Strings(distinctPattterns)
+	fmt.Printf("Distinct patterns: %s\n", distinctPattterns)
 
 }
