@@ -90,11 +90,10 @@ func main() {
 	clusterHosts := hostPool.GetHostsInCluster(cluster)
 
 	for _, h := range clusterHosts.Hosts {
-		fmt.Printf("Host %q has VMs\n", h.Name)
+		fmt.Printf("Host %q runs %d VM(s)\n", h.Name, len(h.VmPool.Vms))
 		for _, vm := range h.VmPool.Vms {
 			fmt.Printf("%s\n", vm.Name)
 		}
-		fmt.Printf("# of vms: %d\n", len(h.VmPool.Vms))
 		distinctPattterns := h.VmPool.GetDistinctVmNamePatterns(
 			patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
 		fmt.Printf("Distinct VM name patterns on host %q: %v\n", h.Name, distinctPattterns)
