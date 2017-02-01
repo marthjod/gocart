@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime/pprof"
+	"sort"
 
 	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/hostpool"
@@ -88,6 +89,7 @@ func main() {
 		}
 	}
 	clusterHosts := hostPool.GetHostsInCluster(cluster)
+	var distinctPatternsInCluster = make(map[string]bool, 0)
 
 	for _, h := range clusterHosts.Hosts {
 		fmt.Printf("Host %q runs %d VM(s)\n", h.Name, len(h.VmPool.Vms))
@@ -97,7 +99,18 @@ func main() {
 		distinctPattterns := h.VmPool.GetDistinctVmNamePatterns(
 			patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
 		fmt.Printf("Distinct VM name patterns on host %q: %v\n", h.Name, distinctPattterns)
+		for pattern, _ := range distinctPattterns {
+			distinctPatternsInCluster[pattern] = true
+		}
 	}
+
+	var patterns = make([]string, 0)
+	for pattern, _ := range distinctPatternsInCluster {
+		patterns = append(patterns, pattern)
+	}
+	sort.Strings(patterns)
+
+	fmt.Printf("Distinct VM name patterns in cluster %q: %s\n", cluster, patterns)
 
 	billingVms, err := vmPool.GetVmsByName("^bil_.+")
 	if err != nil {
