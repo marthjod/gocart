@@ -15,6 +15,7 @@ type XMLRPCEndpointer interface {
 
 type Rpc struct {
 	Client     *xmlrpc.Client
+	Url        string
 	AuthString string
 }
 
@@ -25,6 +26,7 @@ func NewClient(url, user, password string, transport http.RoundTripper) (*Rpc, e
 	}
 	return &Rpc{
 		Client:     client,
+		Url:        url,
 		AuthString: fmt.Sprintf("%s:%s", user, password),
 	}, nil
 }
@@ -43,7 +45,8 @@ func (c *Rpc) Call(endpoint XMLRPCEndpointer) error {
 		return fmt.Errorf("malformed XMLRPC response")
 	}
 	if !apiCallSucceeded {
-		return fmt.Errorf(result[0].(string))
+		// panic: interface conversion: interface is bool, not string
+		return fmt.Errorf("API call against %s unsuccessful", c.Url)
 	}
 	if w, ok := result[1].(string); ok {
 		endpoint.Unmarshal([]byte(w))
