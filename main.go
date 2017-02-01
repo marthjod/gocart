@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"runtime/pprof"
-	"sort"
 
 	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/hostpool"
@@ -98,8 +97,7 @@ func main() {
 		fmt.Printf("# of vms: %d\n", len(h.VmPool.Vms))
 		distinctPattterns := h.VmPool.GetDistinctVmNamePatterns(
 			patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
-		sort.Strings(distinctPattterns)
-		fmt.Printf("Distinct VM name patterns on host %q: %s\n", h.Name, distinctPattterns)
+		fmt.Printf("Distinct VM name patterns on host %q: %v\n", h.Name, distinctPattterns)
 	}
 
 	billingVms, err := vmPool.GetVmsByName("^bil_.+")

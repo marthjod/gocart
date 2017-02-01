@@ -135,7 +135,6 @@ func TestGetDistinctVmNamePatterns(t *testing.T) {
 	var prefix = "^"
 	var infix = ".+"
 	var suffix = "$"
-	var found bool
 	var expectedDistinctPatterns = []struct {
 		filter  string
 		pattern string
@@ -150,15 +149,7 @@ func TestGetDistinctVmNamePatterns(t *testing.T) {
 	for _, expected := range expectedDistinctPatterns {
 		distinctPatterns := pool.GetDistinctVmNamePatterns(expected.filter, prefix, infix, suffix)
 
-		found = false
-		for _, distinctPattern := range distinctPatterns {
-			if distinctPattern == expected.pattern {
-				found = true
-				break
-			}
-		}
-
-		if !found {
+		if !distinctPatterns[expected.pattern] {
 			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)
 		}
 	}

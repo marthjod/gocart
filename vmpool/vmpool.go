@@ -72,11 +72,10 @@ func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
 	return &pool, nil
 }
 
-func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix string) []string {
+func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix string) map[string]bool {
 	var (
-		distinctPatternsSet = make(map[string]bool, 0)
-		distinctPatterns    = make([]string, 0)
-		pattern             string
+		distinctPatterns = make(map[string]bool, 0)
+		pattern          string
 	)
 
 	re := regexp.MustCompile(filter)
@@ -90,14 +89,10 @@ func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix st
 
 		if len(groups) >= 3 {
 			pattern = fmt.Sprintf("%s%s%s%s%s", prefix, groups[1], infix, groups[2], suffix)
-			distinctPatternsSet[pattern] = true
+			distinctPatterns[pattern] = true
 		} else {
-			distinctPatternsSet[vm.Name] = true
+			distinctPatterns[vm.Name] = true
 		}
-	}
-
-	for pattern, _ := range distinctPatternsSet {
-		distinctPatterns = append(distinctPatterns, pattern)
 	}
 
 	return distinctPatterns
