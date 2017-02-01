@@ -96,6 +96,10 @@ func main() {
 			fmt.Printf("%s\n", vm.Name)
 		}
 		fmt.Printf("# of vms: %d\n", len(h.VmPool.Vms))
+		distinctPattterns := h.VmPool.GetDistinctVmNamePatterns(
+			patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
+		sort.Strings(distinctPattterns)
+		fmt.Printf("Distinct VM name patterns on host %q: %s\n", h.Name, distinctPattterns)
 	}
 
 	billingVms, err := vmPool.GetVmsByName("^bil_.+")
@@ -115,10 +119,4 @@ func main() {
 		fmt.Printf("%s\n", acsFQDN)
 
 	}
-
-	distinctPattterns := vmPool.GetDistinctVmNamePatterns(
-		patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
-	sort.Strings(distinctPattterns)
-	fmt.Printf("Distinct patterns: %s\n", distinctPattterns)
-
 }
