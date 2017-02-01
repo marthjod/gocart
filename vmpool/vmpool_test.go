@@ -130,3 +130,27 @@ func TestGetVmsByName(t *testing.T) {
 
 	}
 }
+
+func TestGetDistinctVmNamePatterns(t *testing.T) {
+	var prefix = "^"
+	var infix = ".+"
+	var suffix = "$"
+	var expectedDistinctPatterns = []struct {
+		filter  string
+		pattern string
+	}{
+		{"^([vm]{2})-([ni]{2})$", "^vm.+in$"},
+		{"^vm-(ex)....(e)$", "^ex.+e$"},
+		{"^vm-([a-z]{4}).(.).*", "^exam.+l$"},
+	}
+
+	pool := getVmPoolFromFile("testdata/vmpool.xml")
+
+	for _, expected := range expectedDistinctPatterns {
+		distinctPatterns := pool.GetDistinctVmNamePatterns(expected.filter, prefix, infix, suffix)
+
+		if !distinctPatterns[expected.pattern] {
+			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)
+		}
+	}
+}

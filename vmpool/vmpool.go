@@ -2,6 +2,7 @@ package vmpool
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 	"regexp"
 
@@ -69,4 +70,30 @@ func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
 		}
 	}
 	return &pool, nil
+}
+
+func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix string) map[string]bool {
+	var (
+		distinctPatterns = make(map[string]bool, 0)
+		pattern          string
+	)
+
+	re := regexp.MustCompile(filter)
+
+	for _, vm := range vmPool.Vms {
+
+		groups := re.FindStringSubmatch(vm.Name)
+		if groups == nil {
+			continue
+		}
+
+		if len(groups) >= 3 {
+			pattern = fmt.Sprintf("%s%s%s%s%s", prefix, groups[1], infix, groups[2], suffix)
+			distinctPatterns[pattern] = true
+		} else {
+			distinctPatterns[vm.Name] = true
+		}
+	}
+
+	return distinctPatterns
 }
