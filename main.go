@@ -51,6 +51,13 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	//client := &http.Client{
+	//	Transport: &http.Transport{
+	//		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	//	},
+	//}
+	//apiClient, err := api.NewClientHttpClient(url, user, password, client)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
