@@ -72,6 +72,7 @@ type Host struct {
 	XMLName   xml.Name     `xml:"HOST"`
 	Id        int          `xml:"ID"`
 	Name      string       `xml:"NAME"`
+	State     int          `xml:"STATE"`
 	Cluster   string       `xml:"CLUSTER"`
 	ClusterId int          `xml:"CLUSTER_ID"`
 	Template  HostTemplate `xml:"TEMPLATE"`
