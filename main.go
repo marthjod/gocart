@@ -93,6 +93,7 @@ func main() {
 		for i := 0; i < len(hostPool.Hosts); i++ {
 			host := hostPool.Hosts[i]
 			fmt.Printf("%v %v\n", host.Id, host.Template.Datacenter)
+			fmt.Printf("%v %d \n", host.Name, host.State)
 		}
 	}
 	clusterHosts := hostPool.GetHostsInCluster(cluster)

@@ -8,6 +8,17 @@ import (
 	"github.com/marthjod/gocart/vmpool"
 )
 
+const (
+	INIT = iota
+	MONITORING_MONITORED  	// Currently monitoring, previously MONITORED
+	MONITORED
+	ERROR
+	DISABLED
+	MONITORING_ERROR	// Currently monitoring, previously ERROR
+	MONITORING_INIT  	// Currently monitoring, previously initialized
+	MONITORING_DISABLED 	// Currently monitoring, previously DISABLED
+)
+
 type HostPool struct {
 	XMLName xml.Name `xml:"HOST_POOL"`
 	Hosts   []*Host  `xml:"HOST"`
