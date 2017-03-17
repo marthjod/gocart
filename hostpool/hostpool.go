@@ -75,6 +75,22 @@ func (hostPool *HostPool) GetHostsInCluster(cluster string) *HostPool {
 	return &hostpool
 }
 
+// FilterHostsByStates returns host pool containing only hosts in one of the provided states.
+func (hostPool *HostPool) FilterHostsByStates(states ...int) *HostPool {
+	var (
+		hp HostPool
+	)
+	for _, host := range hostPool.Hosts {
+		for _, state := range states {
+			if host.State == state {
+				hp.Hosts = append(hp.Hosts, host)
+				continue
+			}
+		}
+	}
+	return &hp
+}
+
 func (host *Host) MapVms(vmpool *vmpool.VmPool) {
 	host.VmPool = vmpool.GetVmsById(host.VmIds...)
 }

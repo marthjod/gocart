@@ -108,5 +108,26 @@ func TestGetHostsInCluster(t *testing.T) {
 				len(clusterPool.Hosts), expected.poolLen, expected.cluster)
 		}
 	}
+}
 
+func TestFilterHostsByStates(t *testing.T) {
+	pool := getHostPoolFromFile("testdata/hostpool.xml")
+
+	disabledHosts := pool.FilterHostsByStates(hostpool.DISABLED)
+	if len(disabledHosts.Hosts) != 1 {
+		t.Fatalf("Found more than 1 disabled host")
+	}
+	if disabledHosts.Hosts[0].Name != "thost" {
+		t.Fatalf("Found wrong disabled host %s", disabledHosts.Hosts[0].Name)
+	}
+
+	emptyPool := pool.FilterHostsByStates(hostpool.ERROR)
+	if len(emptyPool.Hosts) > 0 {
+		t.Fatalf("Found more than 0 hosts in state ERROR")
+	}
+
+	twoStates := pool.FilterHostsByStates(hostpool.DISABLED, hostpool.MONITORED)
+	if len(twoStates.Hosts) != 2 {
+		t.Fatalf("Expected 2 hosts for states DISABLED + ERROR, found %d", len(twoStates.Hosts))
+	}
 }

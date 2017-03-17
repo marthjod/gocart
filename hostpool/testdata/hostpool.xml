@@ -33,7 +33,7 @@
   <HOST>
     <ID>1</ID>
     <NAME>thost</NAME>
-    <STATE>2</STATE>
+    <STATE>4</STATE>
     <IM_MAD>im_dummy</IM_MAD>
     <VM_MAD>vmm_dummy</VM_MAD>
     <VN_MAD>vn_dummy</VN_MAD>
