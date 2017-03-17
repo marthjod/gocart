@@ -115,7 +115,7 @@ func TestFilterHostsByStates(t *testing.T) {
 
 	disabledHosts := pool.FilterHostsByStates(hostpool.DISABLED)
 	if len(disabledHosts.Hosts) != 1 {
-		t.Fatalf("Found more than 1 disabled host")
+		t.Fatalf("Expected 1 disabled host, found %d", len(disabledHosts.Hosts))
 	}
 	if disabledHosts.Hosts[0].Name != "thost" {
 		t.Fatalf("Found wrong disabled host %s", disabledHosts.Hosts[0].Name)
