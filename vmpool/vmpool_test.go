@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/marthjod/gocart/vmpool"
+	"github.com/marthjod/gocart/ocatypes"
 )
 
 func getFileContents(path string) []byte {
@@ -148,6 +149,35 @@ func TestGetDistinctVmNamePatterns(t *testing.T) {
 
 	for _, expected := range expectedDistinctPatterns {
 		distinctPatterns := pool.GetDistinctVmNamePatterns(expected.filter, prefix, infix, suffix)
+
+		if !distinctPatterns[expected.pattern] {
+			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)
+		}
+	}
+}
+
+
+func TestGetDistinctVmNamePatternsExtractHostname(t *testing.T) {
+	var prefix = "^"
+	var infix = ".+"
+	var suffix = "$"
+	var expectedDistinctPatterns = []struct {
+		filter  string
+		pattern string
+	}{
+		{".{2}(amp).*(amp)", "^amp.+amp$"},
+		{"^..-(..).*(m)$", "^vm.+m$"},
+		{"^(.{2}).*(example.com)", "^in.+example.com$"},
+	}
+
+	pool := getVmPoolFromFile("testdata/vmpool.xml")
+	fqdnExtractor := func(vm *ocatypes.Vm) string {
+		h, _ := vm.UserTemplate.Items.GetCustom("CUSTOM_FQDN")
+		return h
+	}
+
+	for _, expected := range expectedDistinctPatterns {
+		distinctPatterns := pool.GetDistinctVmNamePatternsExtractHostname(expected.filter, prefix, infix, suffix, fqdnExtractor)
 
 		if !distinctPatterns[expected.pattern] {
 			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)

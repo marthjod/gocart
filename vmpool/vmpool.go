@@ -73,6 +73,16 @@ func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
 }
 
 func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix string) map[string]bool {
+	vmNameExtractor := func(vm *ocatypes.Vm) string {
+		return vm.Name
+	}
+
+	return vmPool.GetDistinctVmNamePatternsExtractHostname(filter, prefix, infix, suffix, vmNameExtractor)
+}
+
+func (vmPool *VmPool) GetDistinctVmNamePatternsExtractHostname(filter, prefix, infix, suffix string,
+	hostNameExtractor func(vm *ocatypes.Vm) string) map[string]bool {
+
 	var (
 		distinctPatterns = make(map[string]bool, 0)
 		pattern          string
@@ -82,7 +92,7 @@ func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix st
 
 	for _, vm := range vmPool.Vms {
 
-		groups := re.FindStringSubmatch(vm.Name)
+		groups := re.FindStringSubmatch(hostNameExtractor(vm))
 		if groups == nil {
 			continue
 		}
