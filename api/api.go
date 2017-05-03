@@ -27,14 +27,6 @@ func NewClient(url, user, password string, transport http.RoundTripper) (*Rpc, e
 	return newClient(url, user, password, client)
 }
 
-func NewClientHttpClient(url, user, password string, httpClient *http.Client) (*Rpc, error) {
-	client, err := xmlrpc.NewClientHttpClient(url, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	return newClient(url, user, password, client)
-}
-
 func newClient(url, user, password string, client *xmlrpc.Client) (*Rpc, error) {
 	return &Rpc{
 		Client:     client,
