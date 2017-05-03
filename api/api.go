@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/marthjod/xmlrpc"
+	"github.com/kolo/xmlrpc"
 )
 
 type XMLRPCEndpointer interface {
