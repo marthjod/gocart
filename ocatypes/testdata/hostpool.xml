@@ -57,7 +57,11 @@
       <USED_CPU>0</USED_CPU>
       <RUNNING_VMS>0</RUNNING_VMS>
     </HOST_SHARE>
-    <VMS/>
+    <VMS>
+      <ID>964</ID>
+      <ID>970</ID>
+      <ID>1079</ID>
+    </VMS>
     <TEMPLATE></TEMPLATE>
   </HOST>
 </HOST_POOL>

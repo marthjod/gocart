@@ -91,6 +91,18 @@ func (hostPool *HostPool) FilterHostsByStates(states ...int) *HostPool {
 	return &hp
 }
 
+func (hostPool *HostPool) FilterOutEmptyHosts() *HostPool {
+	var (
+		hp HostPool
+	)
+	for _, host := range hostPool.Hosts {
+		if !host.IsEmpty() {
+			hp.Hosts = append(hp.Hosts, host)
+		}
+	}
+	return &hp
+}
+
 func (host *Host) MapVms(vmpool *vmpool.VmPool) {
 	host.VmPool = vmpool.GetVmsById(host.VmIds...)
 }

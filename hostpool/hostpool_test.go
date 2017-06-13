@@ -98,6 +98,16 @@ func TestFromReader(t *testing.T) {
 
 }
 
+func TestHost_String(t *testing.T) {
+	pool := getHostPoolFromFile("testdata/hostpool.xml")
+	for _, host := range pool.Hosts {
+		if host.String() != fmt.Sprintf(host.Name) {
+			t.Errorf("String() does not match host name")
+		}
+		break
+	}
+}
+
 func TestGetHostsInCluster(t *testing.T) {
 	pool := getHostPoolFromFile("testdata/hostpool.xml")
 
@@ -129,5 +139,26 @@ func TestFilterHostsByStates(t *testing.T) {
 	twoStates := pool.FilterHostsByStates(hostpool.DISABLED, hostpool.MONITORED)
 	if len(twoStates.Hosts) != 2 {
 		t.Fatalf("Expected 2 hosts for states DISABLED + ERROR, found %d", len(twoStates.Hosts))
+	}
+}
+
+func TestFilterOutEmptyHosts(t *testing.T) {
+	pool := getHostPoolFromFile("testdata/hostpool.xml")
+	hostsRunningVMs := pool.FilterOutEmptyHosts()
+	if len(hostsRunningVMs.Hosts) > 1 {
+		t.Error("Found too many non-empty hosts")
+	}
+}
+
+func TestFilterChain(t *testing.T) {
+	pool := getHostPoolFromFile("testdata/hostpool.xml")
+	disabledHosts := pool.FilterHostsByStates(hostpool.DISABLED)
+	if len(disabledHosts.Hosts) != 1 {
+		t.Errorf("Expected 1 disabled host, found %d", len(disabledHosts.Hosts))
+	}
+
+	filtered := pool.FilterHostsByStates(hostpool.DISABLED).FilterOutEmptyHosts()
+	if len(filtered.Hosts) > 1 	 {
+		t.Error("Found too many hosts while chaining filters")
 	}
 }

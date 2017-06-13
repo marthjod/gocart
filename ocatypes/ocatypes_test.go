@@ -63,7 +63,10 @@ func TestHostIsEmpty(t *testing.T) {
 			if !host.IsEmpty() {
 				t.Error("IsEmpty() should return true for host without VMs")
 			}
-			break
+		} else {
+			if host.IsEmpty() {
+				t.Error("IsEmpty() should return false for host with VMs")
+			}
 		}
 	}
 
