@@ -79,6 +79,10 @@ type Host struct {
 	VmIds     []int        `xml:"VMS>ID"`
 }
 
+func (h *Host) IsEmpty() bool {
+	return len(h.VmIds) == 0
+}
+
 type VmPool struct {
 	XMLName xml.Name `xml:"VM_POOL"`
 	Vms     []Vm     `xml:"VM"` // ?
