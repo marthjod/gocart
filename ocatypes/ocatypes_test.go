@@ -5,14 +5,14 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/marthjod/gocart/hostpool"
 	"github.com/marthjod/gocart/ocatypes"
 	"os"
-	"github.com/marthjod/gocart/hostpool"
 )
 
 var tags = ocatypes.Tags{
 	ocatypes.Tag{
-		XMLName: xml.Name{"", "FOO"},
+		XMLName: xml.Name{Space: "", Local: "FOO"},
 		Content: "FOO_VALUE",
 	},
 }
