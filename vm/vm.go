@@ -2,7 +2,7 @@ package vm
 
 import (
 	"encoding/xml"
-	"gocart/ocatypes"
+	"github.com/marthjod/gocart/ocatypes"
 	"io"
 )
 
