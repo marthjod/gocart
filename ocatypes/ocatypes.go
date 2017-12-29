@@ -65,7 +65,7 @@ type Image struct {
 	Name        string   `xml:"NAME"`
 	Datastore   string   `xml:"DATASTORE"`
 	DatastoreID int      `xml:"DATASTORE_ID"`
-	RunningVMS  int      `xml:"RUNNING_VMS"`
+	RunningVMs  int      `xml:"RUNNING_VMS"`
 }
 
 // Nic represents an network interface
