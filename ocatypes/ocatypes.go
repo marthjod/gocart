@@ -5,21 +5,94 @@ import (
 	"fmt"
 )
 
+// ClusterPool is a list of clusters
+type ClusterPool struct {
+	XMLName  xml.Name   `xml:"CLUSTER_POOL"`
+	Clusters []*Cluster `xml:"CLUSTER"`
+}
+
+// Cluster represents a cluster
+type Cluster struct {
+	XMLName      xml.Name `xml:"CLUSTER"`
+	Name         string   `xml:"NAME"`
+	ID           int      `xml:"ID"`
+	DatastoreIDs []int    `xml:"DATASTORES"`
+	VnetIDs      []int    `xml:"VNETS"`
+}
+
+// DSPool is a list of Datastores
+type DSPool struct {
+	XMLName    xml.Name     `xml:"DATASTORE_POOL"`
+	Datastores []*Datastore `xml:"DATASTORE"`
+}
+
+// Datastore
+type Datastore struct {
+	XMLName   xml.Name `xml:"DATASTORE"`
+	Name      string   `xml:"NAME"`
+	ID        int      `xml:"ID"`
+	ClusterID int      `xml:"CLUSTER_ID"`
+	Cluster   string   `xml:"CLUSTER"`
+}
+
+// VNetPool is a list of Virtual Networks
+type VNetPool struct {
+	XMLName  xml.Name `xml:"VNET_POOL"`
+	Networks []*VNet  `xml:"VNET"`
+}
+
+// VNet represents a virtual network
+type VNet struct {
+	XMLName   xml.Name `xml:"VNET"`
+	Name      string   `xml:"NAME"`
+	ID        int      `xml:"ID"`
+	Cluster   string   `xml:"CLUSTER"`
+	ClusterID int      `xml:"CLUSTER_ID"`
+	Bridge    string   `xml:"BRIDGE"`
+}
+
+// Disk represents a disk
+type Disk struct {
+	XMLName xml.Name `xml:"DISK"`
+	Name    string   `xml:"IMAGE"`
+	ID      int      `xml:"IMAGE_ID"`
+}
+
+// Image represents an image
+type Image struct {
+	XMLName     xml.Name `xml:"IMAGE"`
+	ID          int      `xml:"ID"`
+	Name        string   `xml:"NAME"`
+	Datastore   string   `xml:"DATASTORE"`
+	DatastoreID int      `xml:"DATASTORE_ID"`
+	RunningVMS  int      `xml:"RUNNING_VMS"`
+}
+
+// Nic represents an network interface
 type Nic struct {
 	XMLName   xml.Name `xml:"NIC"`
+	Name      string   `xml:"NETWORK"`
 	NetworkId int      `xml:"NETWORK_ID"`
 }
 
+// VMTemplatePool is a list of VMTemplates
+type VMTemplatePool struct {
+	XMLName   xml.Name      `xml:"VMTEMPLATE_POOL"`
+	Templates []*VmTemplate `xml:"VMTEMPLATE"`
+}
+
 type HostTemplate struct {
-	XMLName    xml.Name `xml:"TEMPLATE"`
-	Cpu        string   `xml:"CPU"`
-	Disk       string   `xml:"DISK"`
-	Memory     string   `xml:"MEMORY"`
-	Name       string   `xml:"NAME"`
-	Nics       []Nic    `xml:"NIC"`
-	VCpu       string   `xml:"VCPU"`
-	Datacenter string   `xml:"DATACENTER"`
-	Items      Tags     `xml:",any"`
+	XMLName        xml.Name `xml:"TEMPLATE"`
+	Cpu            string   `xml:"CPU"`
+	Disk           []Disk   `xml:"DISK"`
+	Memory         string   `xml:"MEMORY"`
+	Name           string   `xml:"NAME"`
+	Nics           []Nic    `xml:"NIC"`
+	VCpu           string   `xml:"VCPU"`
+	Datacenter     string   `xml:"DATACENTER"`
+	Requirements   string   `xml:"REQUIREMENTS"`
+	DSRequirements string   `xml:"SCHED_DS_REQUIREMENTS"`
+	Items          Tags     `xml:",any"`
 }
 
 type VmTemplate struct {
@@ -31,7 +104,7 @@ type VmTemplate struct {
 	Template HostTemplate `xml:"TEMPLATE"`
 	Memory   int          `xml:"MEMORY"`
 	VmId     int          `xml:"VMID"`
-	Disk     string       `xml:"DISK"`
+	Disk     []Disk       `xml:"DISK"`
 	Cpu      string       `xml:"CPU"`
 }
 
