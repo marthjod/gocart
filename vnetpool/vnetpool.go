@@ -50,7 +50,7 @@ func (vt *VNetPool) GetVNetByID(i int) (vnet *ocatypes.VNet, err error) {
 			return net, nil
 		}
 	}
-	return vnet, fmt.Errorf("could not find network with ID %s", i)
+	return vnet, fmt.Errorf("could not find network with ID %d", i)
 }
 
 // ExistsID does this vnet exists?
