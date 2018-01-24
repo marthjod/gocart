@@ -107,3 +107,13 @@ func (vmPool *VmPool) GetDistinctVmNamePatternsExtractHostname(filter, prefix, i
 
 	return distinctPatterns
 }
+
+func (vmPool *VmPool) GetVmsByLCMState(state ocatypes.LCMState) (*VmPool, error) {
+	var pool VmPool
+	for _, vm := range vmPool.Vms {
+		if vm.LCMState == state {
+			pool.Vms = append(pool.Vms, vm)
+		}
+	}
+	return &pool, nil
+}
