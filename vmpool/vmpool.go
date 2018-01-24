@@ -14,6 +14,16 @@ type VmPool struct {
 	Vms     []*ocatypes.Vm `xml:"VM"`
 }
 
+func (vmpool *VmPool) String() string {
+	var list = []string{}
+
+	for _, vm := range vmpool.Vms {
+		list = append(list, vm.Name)
+	}
+
+	return fmt.Sprintf("%s", list)
+}
+
 // ApiMethod implements the api.Endpointer interface
 func (vmpool *VmPool) ApiMethod() string {
 	return "one.vmpool.info"
