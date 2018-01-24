@@ -183,7 +183,7 @@ type Vm struct {
 	Name         string       `xml:"NAME"`
 	Cpu          int          `xml:"CPU"`
 	LastPoll     int          `xml:"LAST_POLL"`
-	LCMState     int          `xml:"LCM_STATE"`
+	LCMState     LCMState     `xml:"LCM_STATE"`
 	Resched      int          `xml:"RESCHED"`
 	DeployId     string       `xml:"DEPLOY_ID"`
 	Template     HostTemplate `xml:"TEMPLATE"`
