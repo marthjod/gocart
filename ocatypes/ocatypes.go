@@ -5,6 +5,75 @@ import (
 	"fmt"
 )
 
+// LCMState represents LCM (lifecycle manager) state
+type LCMState int
+
+//go:generate stringer -type=LCMState
+const (
+	LcmInit                      LCMState = iota
+	Prolog                       LCMState = iota
+	Boot                         LCMState = iota
+	Running                      LCMState = iota
+	Migrate                      LCMState = iota
+	SaveStop                     LCMState = iota
+	SaveSuspend                  LCMState = iota
+	SaveMigrate                  LCMState = iota
+	PrologMigrate                LCMState = iota
+	PrologResume                 LCMState = iota
+	EpilogStop                   LCMState = iota
+	Epilog                       LCMState = iota
+	Shutdown                     LCMState = iota
+	CleanupResubmit              LCMState = iota
+	Unknown                      LCMState = iota
+	Hotplug                      LCMState = iota
+	ShutdownPoweroff             LCMState = iota
+	BootUnknown                  LCMState = iota
+	BootPoweroff                 LCMState = iota
+	BootSuspended                LCMState = iota
+	BootStopped                  LCMState = iota
+	CleanupDelete                LCMState = iota
+	HotplugSnapshot              LCMState = iota
+	HotplugNic                   LCMState = iota
+	HotplugSaveas                LCMState = iota
+	HotplugSaveasPoweroff        LCMState = iota
+	HotplugSaveasSuspended       LCMState = iota
+	ShutdownUndeploy             LCMState = iota
+	EpilogUndeploy               LCMState = iota
+	PrologUndeploy               LCMState = iota
+	BootUndeploy                 LCMState = iota
+	HotplugPrologPoweroff        LCMState = iota
+	HotplugEpilogPoweroff        LCMState = iota
+	BootMigrate                  LCMState = iota
+	BootFailure                  LCMState = iota
+	BootMigrateFailure           LCMState = iota
+	PrologMigrateFailure         LCMState = iota
+	PrologFailure                LCMState = iota
+	EpilogFailure                LCMState = iota
+	EpilogStopFailure            LCMState = iota
+	EpilogUndeployFailure        LCMState = iota
+	PrologMigratePoweroff        LCMState = iota
+	PrologMigratePoweroffFailure LCMState = iota
+	PrologMigrateSuspend         LCMState = iota
+	PrologMigrateSuspendFailure  LCMState = iota
+	BootUndeployFailure          LCMState = iota
+	BootStoppedFailure           LCMState = iota
+	PrologResumeFailure          LCMState = iota
+	PrologUndeployFailure        LCMState = iota
+	DiskSnapshotPoweroff         LCMState = iota
+	DiskSnapshotRevertPoweroff   LCMState = iota
+	DiskSnapshotDeletePoweroff   LCMState = iota
+	DiskSnapshotSuspended        LCMState = iota
+	DiskSnapshotRevertSuspended  LCMState = iota
+	DiskSnapshotDeleteSuspended  LCMState = iota
+	DiskSnapshot                 LCMState = iota
+	DiskSnapshotDelete           LCMState = iota
+	PrologMigrateUnknown         LCMState = iota
+	PrologMigrateUnknownFailure  LCMState = iota
+	DiskResize                   LCMState = iota
+	DiskResizePoweroff           LCMState = iota
+	DiskResizeUndeployed         LCMState = iota
+)
+
 // ClusterPool is a list of clusters
 type ClusterPool struct {
 	XMLName  xml.Name   `xml:"CLUSTER_POOL"`
