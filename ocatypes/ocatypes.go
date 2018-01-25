@@ -74,6 +74,76 @@ const (
 	DiskResizeUndeployed         LCMState = iota
 )
 
+var lcmStates = map[string]LCMState{
+	"LcmInit":                      LcmInit,
+	"Prolog":                       Prolog,
+	"Boot":                         Boot,
+	"Running":                      Running,
+	"Migrate":                      Migrate,
+	"SaveStop":                     SaveStop,
+	"SaveSuspend":                  SaveSuspend,
+	"SaveMigrate":                  SaveMigrate,
+	"PrologMigrate":                PrologMigrate,
+	"PrologResume":                 PrologResume,
+	"EpilogStop":                   EpilogStop,
+	"Epilog":                       Epilog,
+	"Shutdown":                     Shutdown,
+	"CleanupResubmit":              CleanupResubmit,
+	"Unknown":                      Unknown,
+	"Hotplug":                      Hotplug,
+	"ShutdownPoweroff":             ShutdownPoweroff,
+	"BootUnknown":                  BootUnknown,
+	"BootPoweroff":                 BootPoweroff,
+	"BootSuspended":                BootSuspended,
+	"BootStopped":                  BootStopped,
+	"CleanupDelete":                CleanupDelete,
+	"HotplugSnapshot":              HotplugSnapshot,
+	"HotplugNic":                   HotplugNic,
+	"HotplugSaveas":                HotplugSaveas,
+	"HotplugSaveasPoweroff":        HotplugSaveasPoweroff,
+	"HotplugSaveasSuspended":       HotplugSaveasSuspended,
+	"ShutdownUndeploy":             ShutdownUndeploy,
+	"EpilogUndeploy":               EpilogUndeploy,
+	"PrologUndeploy":               PrologUndeploy,
+	"BootUndeploy":                 BootUndeploy,
+	"HotplugPrologPoweroff":        HotplugPrologPoweroff,
+	"HotplugEpilogPoweroff":        HotplugEpilogPoweroff,
+	"BootMigrate":                  BootMigrate,
+	"BootFailure":                  BootFailure,
+	"BootMigrateFailure":           BootMigrateFailure,
+	"PrologMigrateFailure":         PrologMigrateFailure,
+	"PrologFailure":                PrologFailure,
+	"EpilogFailure":                EpilogFailure,
+	"EpilogStopFailure":            EpilogStopFailure,
+	"EpilogUndeployFailure":        EpilogUndeployFailure,
+	"PrologMigratePoweroff":        PrologMigratePoweroff,
+	"PrologMigratePoweroffFailure": PrologMigratePoweroffFailure,
+	"PrologMigrateSuspend":         PrologMigrateSuspend,
+	"PrologMigrateSuspendFailure":  PrologMigrateSuspendFailure,
+	"BootUndeployFailure":          BootUndeployFailure,
+	"BootStoppedFailure":           BootStoppedFailure,
+	"PrologResumeFailure":          PrologResumeFailure,
+	"PrologUndeployFailure":        PrologUndeployFailure,
+	"DiskSnapshotPoweroff":         DiskSnapshotPoweroff,
+	"DiskSnapshotRevertPoweroff":   DiskSnapshotRevertPoweroff,
+	"DiskSnapshotDeletePoweroff":   DiskSnapshotDeletePoweroff,
+	"DiskSnapshotSuspended":        DiskSnapshotSuspended,
+	"DiskSnapshotRevertSuspended":  DiskSnapshotRevertSuspended,
+	"DiskSnapshotDeleteSuspended":  DiskSnapshotDeleteSuspended,
+	"DiskSnapshot":                 DiskSnapshot,
+	"DiskSnapshotDelete":           DiskSnapshotDelete,
+	"PrologMigrateUnknown":         PrologMigrateUnknown,
+	"PrologMigrateUnknownFailure":  PrologMigrateUnknownFailure,
+	"DiskResize":                   DiskResize,
+	"DiskResizePoweroff":           DiskResizePoweroff,
+	"DiskResizeUndeployed":         DiskResizeUndeployed,
+}
+
+// GetLCMState returns an LCMState for a given string
+func GetLCMState(state string) LCMState {
+	return lcmStates[state]
+}
+
 // ClusterPool is a list of clusters
 type ClusterPool struct {
 	XMLName  xml.Name   `xml:"CLUSTER_POOL"`
