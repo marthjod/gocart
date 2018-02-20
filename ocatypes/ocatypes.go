@@ -235,7 +235,7 @@ type HostTemplate struct {
 }
 
 type VmTemplate struct {
-	Id       int          `xml:"ID"`
+	Id       int          `xml:"TEMPLATE_ID"`
 	Name     string       `xml:"NAME"`
 	Uname    string       `xml:"UNAME"`
 	RegTime  int          `xml:"REGTIME"`
