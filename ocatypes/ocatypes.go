@@ -235,7 +235,6 @@ type HostTemplate struct {
 }
 
 type VmTemplate struct {
-	XMLName  xml.Name     `xml:"VMTEMPLATE"`
 	Id       int          `xml:"ID"`
 	Name     string       `xml:"NAME"`
 	Uname    string       `xml:"UNAME"`
