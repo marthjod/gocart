@@ -74,7 +74,8 @@ const (
 	DiskResizeUndeployed         LCMState = iota
 )
 
-var lcmStates = map[string]LCMState{
+// LCMStates maps LCM state names to their constant LCMState values.
+var LCMStates = map[string]LCMState{
 	"LcmInit":                      LcmInit,
 	"Prolog":                       Prolog,
 	"Boot":                         Boot,
@@ -141,7 +142,7 @@ var lcmStates = map[string]LCMState{
 
 // GetLCMState returns an LCMState for a given string
 func GetLCMState(state string) LCMState {
-	return lcmStates[state]
+	return LCMStates[state]
 }
 
 // ClusterPool is a list of clusters
