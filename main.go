@@ -9,6 +9,7 @@ import (
 	"os"
 	"runtime/pprof"
 	"sort"
+	"time"
 
 	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/hostpool"
@@ -23,6 +24,7 @@ func main() {
 		user                string
 		password            string
 		url                 string
+		timeout             int64
 		patternFilter       string
 		patternFilterPrefix string
 		patternFilterInfix  string
@@ -31,6 +33,7 @@ func main() {
 
 	flag.StringVar(&cluster, "cluster", "", "Cluster name for host pool lookups")
 	flag.BoolVar(&verbose, "v", false, "Verbose mode")
+	flag.Int64Var(&timeout, "timeout", 30, "Timeout in seconds")
 	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to file")
 	flag.StringVar(&user, "user", "", `OpenNebula User`)
 	flag.StringVar(&password, "password", "", `OpenNebula Password`)
@@ -54,7 +57,7 @@ func main() {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	apiClient, err := api.NewClient(url, user, password, tr)
+	apiClient, err := api.NewClient(url, user, password, tr, time.Duration(timeout)*time.Second)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -100,13 +103,13 @@ func main() {
 		distinctPattterns := h.VmPool.GetDistinctVmNamePatterns(
 			patternFilter, patternFilterPrefix, patternFilterInfix, patternFilterSuffix)
 		fmt.Printf("Distinct VM name patterns on host %q: %v\n", h.Name, distinctPattterns)
-		for pattern, _ := range distinctPattterns {
+		for pattern := range distinctPattterns {
 			distinctPatternsInCluster[pattern] = true
 		}
 	}
 
 	var patterns = make([]string, 0)
-	for pattern, _ := range distinctPatternsInCluster {
+	for pattern := range distinctPatternsInCluster {
 		patterns = append(patterns, pattern)
 	}
 	sort.Strings(patterns)
