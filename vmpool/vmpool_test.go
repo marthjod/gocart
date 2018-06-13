@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/marthjod/gocart/vmpool"
 	"github.com/marthjod/gocart/ocatypes"
+	"github.com/marthjod/gocart/vmpool"
 )
 
 func getFileContents(path string) []byte {
@@ -18,28 +18,28 @@ func getFileContents(path string) []byte {
 	return f
 }
 
-func getVmPoolFromFile(path string) *vmpool.VmPool {
-	pool := vmpool.NewVmPool()
+func getVMPoolFromFile(path string) *vmpool.VMPool {
+	pool := vmpool.NewVMPool()
 	xml := getFileContents(path)
 	_ = pool.Unmarshal(xml)
 	return pool
 }
 
-func TestApiMethod(t *testing.T) {
+func TestAPIMethod(t *testing.T) {
 	const apiMethod = "one.vmpool.info"
 
-	if vmpool.NewVmPool().ApiMethod() != apiMethod {
+	if vmpool.NewVMPool().APIMethod() != apiMethod {
 		t.Fatalf("API method differs from %s", apiMethod)
 	}
 }
 
-func TestApiArgs(t *testing.T) {
+func TestAPIArgs(t *testing.T) {
 	const (
 		authstring = "user:pass"
 		expected   = "[user:pass %!s(int=-2) %!s(int=-1) %!s(int=-1) %!s(int=-1)]"
 	)
 
-	args := vmpool.NewVmPool().ApiArgs(authstring)
+	args := vmpool.NewVMPool().APIArgs(authstring)
 	argsStr := fmt.Sprintf("%s", args)
 	if argsStr != expected {
 		t.Fatalf("Mismatch: %s != %s", argsStr, expected)
@@ -47,7 +47,7 @@ func TestApiArgs(t *testing.T) {
 }
 
 func TestUnmarshalValidVmpool(t *testing.T) {
-	pool := vmpool.NewVmPool()
+	pool := vmpool.NewVMPool()
 	xml := getFileContents("testdata/vmpool.xml")
 
 	err := pool.Unmarshal(xml)
@@ -58,7 +58,7 @@ func TestUnmarshalValidVmpool(t *testing.T) {
 
 func TestUnmarshalInvalidXML(t *testing.T) {
 	var expected = "expected element type <VM_POOL> but have <INVALID_VM_POOL>"
-	pool := vmpool.NewVmPool()
+	pool := vmpool.NewVMPool()
 	xml := getFileContents("testdata/invalid-vmpool.xml")
 
 	err := pool.Unmarshal(xml)
@@ -75,7 +75,9 @@ func TestFromReader(t *testing.T) {
 	var expected = 3
 
 	f, err := os.Open("testdata/vmpool.xml")
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -85,48 +87,48 @@ func TestFromReader(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	if len(pool.Vms) != expected {
-		t.Errorf("VM pool has length %d, expected %d", len(pool.Vms), expected)
+	if len(pool.VMs) != expected {
+		t.Errorf("VM pool has length %d, expected %d", len(pool.VMs), expected)
 	}
 
 }
 
-func TestGetVmsById(t *testing.T) {
-	var expectedVmsById = map[int]int{
+func TestGetVMsById(t *testing.T) {
+	var expectedVMsById = map[int]int{
 		6:    1,
 		7:    1,
 		8:    1,
 		1337: 0,
 	}
 
-	pool := getVmPoolFromFile("testdata/vmpool.xml")
+	pool := getVMPoolFromFile("testdata/vmpool.xml")
 
-	for id, vmsExpected := range expectedVmsById {
-		vmsFound := pool.GetVmsById(id)
-		if len(vmsFound.Vms) != vmsExpected {
-			t.Errorf("Expected %d VM(s), found %d", vmsExpected, len(vmsFound.Vms))
+	for id, vmsExpected := range expectedVMsById {
+		vmsFound := pool.GetVMsByID(id)
+		if len(vmsFound.VMs) != vmsExpected {
+			t.Errorf("Expected %d VM(s), found %d", vmsExpected, len(vmsFound.VMs))
 		}
 	}
 
 }
 
-func TestGetVmsByName(t *testing.T) {
-	var expectedVmsByPattern = map[string]int{
+func TestGetVMsByName(t *testing.T) {
+	var expectedVMsByPattern = map[string]int{
 		"^vm":      3,
 		"vm-in$":   2,
 		"exa":      1,
 		"dummy-vm": 0,
 	}
 
-	pool := getVmPoolFromFile("testdata/vmpool.xml")
+	pool := getVMPoolFromFile("testdata/vmpool.xml")
 
-	for pattern, vmsExpected := range expectedVmsByPattern {
-		vmsFound, err := pool.GetVmsByName(pattern)
+	for pattern, vmsExpected := range expectedVMsByPattern {
+		vmsFound, err := pool.GetVMsByName(pattern)
 		if err != nil {
 			t.Fatal(err.Error())
 		}
-		if len(vmsFound.Vms) != vmsExpected {
-			t.Errorf("%q: expected %d VM(s), found %d", pattern, vmsExpected, len(vmsFound.Vms))
+		if len(vmsFound.VMs) != vmsExpected {
+			t.Errorf("%q: expected %d VM(s), found %d", pattern, vmsExpected, len(vmsFound.VMs))
 		}
 
 	}
@@ -145,17 +147,16 @@ func TestGetDistinctVmNamePatterns(t *testing.T) {
 		{"^vm-([a-z]{4}).(.).*", "^exam.+l$"},
 	}
 
-	pool := getVmPoolFromFile("testdata/vmpool.xml")
+	pool := getVMPoolFromFile("testdata/vmpool.xml")
 
 	for _, expected := range expectedDistinctPatterns {
-		distinctPatterns := pool.GetDistinctVmNamePatterns(expected.filter, prefix, infix, suffix)
+		distinctPatterns := pool.GetDistinctVMNamePatterns(expected.filter, prefix, infix, suffix)
 
 		if !distinctPatterns[expected.pattern] {
 			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)
 		}
 	}
 }
-
 
 func TestGetDistinctVmNamePatternsExtractHostname(t *testing.T) {
 	var prefix = "^"
@@ -170,14 +171,14 @@ func TestGetDistinctVmNamePatternsExtractHostname(t *testing.T) {
 		{"^(.{2}).*(example.com)", "^in.+example.com$"},
 	}
 
-	pool := getVmPoolFromFile("testdata/vmpool.xml")
-	fqdnExtractor := func(vm *ocatypes.Vm) string {
+	pool := getVMPoolFromFile("testdata/vmpool.xml")
+	fqdnExtractor := func(vm *ocatypes.VM) string {
 		h, _ := vm.UserTemplate.Items.GetCustom("CUSTOM_FQDN")
 		return h
 	}
 
 	for _, expected := range expectedDistinctPatterns {
-		distinctPatterns := pool.GetDistinctVmNamePatternsExtractHostname(expected.filter, prefix, infix, suffix, fqdnExtractor)
+		distinctPatterns := pool.GetDistinctVMNamePatternsExtractHostname(expected.filter, prefix, infix, suffix, fqdnExtractor)
 
 		if !distinctPatterns[expected.pattern] {
 			t.Errorf("Expected distinct pattern %q not extracted by filter %q", expected.pattern, expected.filter)

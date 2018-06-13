@@ -7,36 +7,34 @@ import (
 	"github.com/marthjod/gocart/ocatypes"
 )
 
-// ClusterPool is a list of VMTemplates
+// ClusterPool is a list of Clusters.
 type ClusterPool struct {
 	XMLName  xml.Name            `xml:"CLUSTER_POOL"`
 	Clusters []*ocatypes.Cluster `xml:"CLUSTER"`
 }
 
-// ApiMethod implements the api.Endpointer interface
-func (vt *ClusterPool) ApiMethod() string {
+// APIMethod implements the api.Endpointer interface.
+func (vt *ClusterPool) APIMethod() string {
 	return "one.clusterpool.info"
 }
 
 // Unmarshal implements the api.Endpointer interface
 func (vt *ClusterPool) Unmarshal(data []byte) error {
-	err := xml.Unmarshal(data, vt)
-	return err
+	return xml.Unmarshal(data, vt)
 }
 
-// ApiArgs implements the api.Endpointer interface
+// APIArgs implements the api.Endpointer interface.
 // API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html
-func (vt *ClusterPool) ApiArgs(authstring string) []interface{} {
+func (vt *ClusterPool) APIArgs(authstring string) []interface{} {
 	return []interface{}{authstring, -2, -1, -1}
 }
 
 // NewClusterPool creates a new ClusterPool
 func NewClusterPool() *ClusterPool {
-	p := new(ClusterPool)
-	return p
+	return &ClusterPool{}
 }
 
-// ExistsName does this cluster exists?
+// ExistsName determines if a cluster pool with a given name exists.
 func (vt *ClusterPool) ExistsName(n string) bool {
 	for _, cl := range vt.Clusters {
 		if cl.Name == n {
@@ -46,7 +44,7 @@ func (vt *ClusterPool) ExistsName(n string) bool {
 	return false
 }
 
-// ExistsID does this cluster exists?
+// ExistsID determines if a cluster pool with a given ID exists.
 func (vt *ClusterPool) ExistsID(n int) bool {
 	for _, cl := range vt.Clusters {
 		if cl.ID == n {

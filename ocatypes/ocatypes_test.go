@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
+	"os"
+
 	"github.com/marthjod/gocart/hostpool"
 	"github.com/marthjod/gocart/ocatypes"
-	"os"
 )
 
 var tags = ocatypes.Tags{
@@ -46,7 +47,9 @@ func TestGetCustom(t *testing.T) {
 func TestHostIsEmpty(t *testing.T) {
 	fixture := "testdata/hostpool.xml"
 	f, err := os.Open(fixture)
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -58,7 +61,7 @@ func TestHostIsEmpty(t *testing.T) {
 
 	emptyHostFound := false
 	for _, host := range pool.Hosts {
-		if len(host.VmIds) == 0 {
+		if len(host.VMIDs) == 0 {
 			emptyHostFound = true
 			if !host.IsEmpty() {
 				t.Error("IsEmpty() should return true for host without VMs")

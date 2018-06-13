@@ -9,11 +9,11 @@ import (
 // VMTemplatePool is a list of VMTemplates
 type VMTemplatePool struct {
 	XMLName   xml.Name               `xml:"VMTEMPLATE_POOL"`
-	Templates []*ocatypes.VmTemplate `xml:"VMTEMPLATE"`
+	Templates []*ocatypes.VMTemplate `xml:"VMTEMPLATE"`
 }
 
-// ApiMethod implements the api.Endpointer interface
-func (vt *VMTemplatePool) ApiMethod() string {
+// APIMethod implements the api.Endpointer interface
+func (vt *VMTemplatePool) APIMethod() string {
 	return "one.templatepool.info"
 }
 
@@ -23,9 +23,9 @@ func (vt *VMTemplatePool) Unmarshal(data []byte) error {
 	return err
 }
 
-// ApiArgs implements the api.Endpointer interface
+// APIArgs implements the api.Endpointer interface
 // API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html#one-template-info
-func (vt *VMTemplatePool) ApiArgs(authstring string) []interface{} {
+func (vt *VMTemplatePool) APIArgs(authstring string) []interface{} {
 	return []interface{}{authstring, -2, -1, -1}
 }
 

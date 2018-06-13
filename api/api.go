@@ -8,20 +8,22 @@ import (
 	"github.com/bogue1979/xmlrpc"
 )
 
+// XMLRPCEndpointer defines behavior of a specific XML-RPC API endpoint.
 type XMLRPCEndpointer interface {
-	ApiMethod() string
-	ApiArgs(string) []interface{}
+	APIMethod() string
+	APIArgs(string) []interface{}
 	Unmarshal([]byte) error
 }
 
-type Rpc struct {
+// RPC represents an XML-RPC client.
+type RPC struct {
 	Client     *xmlrpc.Client
-	Url        string
+	URL        string
 	AuthString string
 }
 
-// NewClient creates a RPC connection
-func NewClient(url, user, password string, transport http.RoundTripper, timeout time.Duration) (*Rpc, error) {
+// NewClient returns a prepared XML-RPC client.
+func NewClient(url, user, password string, transport http.RoundTripper, timeout time.Duration) (*RPC, error) {
 	client, err := xmlrpc.NewClient(url, transport, timeout)
 	if err != nil {
 		return nil, err
@@ -29,18 +31,18 @@ func NewClient(url, user, password string, transport http.RoundTripper, timeout 
 	return newClient(url, user, password, client)
 }
 
-func newClient(url, user, password string, client *xmlrpc.Client) (*Rpc, error) {
-	return &Rpc{
+func newClient(url, user, password string, client *xmlrpc.Client) (*RPC, error) {
+	return &RPC{
 		Client:     client,
-		Url:        url,
+		URL:        url,
 		AuthString: fmt.Sprintf("%s:%s", user, password),
 	}, nil
 }
 
-// Call the endpoint
-func (c *Rpc) Call(endpoint XMLRPCEndpointer) error {
-	args := endpoint.ApiArgs(c.AuthString)
-	method := endpoint.ApiMethod()
+// Call issues a request against the API endpoint.
+func (c *RPC) Call(endpoint XMLRPCEndpointer) error {
+	args := endpoint.APIArgs(c.AuthString)
+	method := endpoint.APIMethod()
 	result := []interface{}{}
 
 	if err := c.Client.Call(method, args, &result); err != nil {
@@ -53,11 +55,11 @@ func (c *Rpc) Call(endpoint XMLRPCEndpointer) error {
 	}
 	if !apiCallSucceeded {
 		// panic: interface conversion: interface is bool, not string
-		return fmt.Errorf("API call against %s unsuccessful", c.Url)
+		return fmt.Errorf("API call against %s unsuccessful", c.URL)
 	}
 	if w, ok := result[1].(string); ok {
 		endpoint.Unmarshal([]byte(w))
 		return nil
 	}
-	return fmt.Errorf("no know result type received from RPC call")
+	return fmt.Errorf("no known result type received from RPC call")
 }

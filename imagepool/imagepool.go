@@ -6,14 +6,14 @@ import (
 	"github.com/marthjod/gocart/ocatypes"
 )
 
-// ImagePool is a list of VMTemplates
+// ImagePool is a list of Images.
 type ImagePool struct {
 	XMLName xml.Name          `xml:"IMAGE_POOL"`
 	Images  []*ocatypes.Image `xml:"IMAGE"`
 }
 
-// ApiMethod implements the api.Endpointer interface
-func (vt *ImagePool) ApiMethod() string {
+// APIMethod implements the api.Endpointer interface
+func (vt *ImagePool) APIMethod() string {
 	return "one.imagepool.info"
 }
 
@@ -23,9 +23,9 @@ func (vt *ImagePool) Unmarshal(data []byte) error {
 	return err
 }
 
-// ApiArgs implements the api.Endpointer interface
+// APIArgs implements the api.Endpointer interface
 // API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html#one-template-info
-func (vt *ImagePool) ApiArgs(authstring string) []interface{} {
+func (vt *ImagePool) APIArgs(authstring string) []interface{} {
 	return []interface{}{authstring, -2, -1, -1}
 }
 

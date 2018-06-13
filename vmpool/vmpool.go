@@ -9,44 +9,48 @@ import (
 	"github.com/marthjod/gocart/ocatypes"
 )
 
-type VmPool struct {
+// VMPool represents a VM pool.
+type VMPool struct {
 	XMLName xml.Name       `xml:"VM_POOL"`
-	Vms     []*ocatypes.Vm `xml:"VM"`
+	VMs     []*ocatypes.VM `xml:"VM"`
 }
 
-func (vmpool *VmPool) String() string {
+// String returns a string representation of a VM pool.
+func (p *VMPool) String() string {
 	var list = []string{}
 
-	for _, vm := range vmpool.Vms {
+	for _, vm := range p.VMs {
 		list = append(list, vm.Name)
 	}
 
 	return fmt.Sprintf("%s", list)
 }
 
-// ApiMethod implements the api.Endpointer interface
-func (vmpool *VmPool) ApiMethod() string {
+// APIMethod implements the api.Endpointer interface
+func (p *VMPool) APIMethod() string {
 	return "one.vmpool.info"
 }
 
-// ApiArgs implements the api.Endpointer interface
+// APIArgs implements the api.Endpointer interface
 // API parameter documentation: http://docs.opennebula.org/4.10/integration/system_interfaces/api.html#one-vmpool-info
-func (vmpool *VmPool) ApiArgs(authstring string) []interface{} {
+func (p *VMPool) APIArgs(authstring string) []interface{} {
 	return []interface{}{authstring, -2, -1, -1, -1}
 }
 
-func (vmpool *VmPool) Unmarshal(data []byte) error {
-	err := xml.Unmarshal(data, vmpool)
+// Unmarshal unmarshals into a VM pool.
+func (p *VMPool) Unmarshal(data []byte) error {
+	err := xml.Unmarshal(data, p)
 	return err
 }
 
-func NewVmPool() *VmPool {
-	p := new(VmPool)
-	return p
+// NewVMPool returns a new VM pool.
+func NewVMPool() *VMPool {
+	return &VMPool{}
 }
 
-func FromReader(r io.Reader) (*VmPool, error) {
-	pool := VmPool{}
+// FromReader reads into a VM pool.
+func FromReader(r io.Reader) (*VMPool, error) {
+	var pool = VMPool{}
 	dec := xml.NewDecoder(r)
 	if err := dec.Decode(&pool); err != nil {
 		return nil, err
@@ -54,53 +58,55 @@ func FromReader(r io.Reader) (*VmPool, error) {
 	return &pool, nil
 }
 
-func (vmPool *VmPool) GetVmsById(ids ...int) *VmPool {
-	var (
-		pool VmPool
-	)
-	for _, vm := range vmPool.Vms {
+// GetVMsByID returns a VM pool based on matching VM IDs.
+func (p *VMPool) GetVMsByID(ids ...int) *VMPool {
+	var pool VMPool
+	for _, vm := range p.VMs {
 		for _, id := range ids {
-			if vm.Id == id {
-				pool.Vms = append(pool.Vms, vm)
+			if vm.ID == id {
+				pool.VMs = append(pool.VMs, vm)
 			}
 		}
 	}
 	return &pool
 }
 
-func (vmPool *VmPool) GetVmsByName(matchPattern string) (*VmPool, error) {
-	var pool VmPool
-	for _, vm := range vmPool.Vms {
+// GetVMsByName returns a VM pool based on matching VM names.
+func (p *VMPool) GetVMsByName(matchPattern string) (*VMPool, error) {
+	var pool VMPool
+	for _, vm := range p.VMs {
 		match, err := regexp.MatchString(matchPattern, vm.Name)
 		if err != nil {
 			return &pool, err
 		}
 		if match {
-			pool.Vms = append(pool.Vms, vm)
+			pool.VMs = append(pool.VMs, vm)
 		}
 	}
 	return &pool, nil
 }
 
-func (vmPool *VmPool) GetDistinctVmNamePatterns(filter, prefix, infix, suffix string) map[string]bool {
-	vmNameExtractor := func(vm *ocatypes.Vm) string {
+// GetDistinctVMNamePatterns returns a set of distinct VM name patterns.
+func (p *VMPool) GetDistinctVMNamePatterns(filter, prefix, infix, suffix string) map[string]bool {
+	vmNameExtractor := func(vm *ocatypes.VM) string {
 		return vm.Name
 	}
 
-	return vmPool.GetDistinctVmNamePatternsExtractHostname(filter, prefix, infix, suffix, vmNameExtractor)
+	return p.GetDistinctVMNamePatternsExtractHostname(filter, prefix, infix, suffix, vmNameExtractor)
 }
 
-func (vmPool *VmPool) GetDistinctVmNamePatternsExtractHostname(filter, prefix, infix, suffix string,
-	hostNameExtractor func(vm *ocatypes.Vm) string) map[string]bool {
+// GetDistinctVMNamePatternsExtractHostname returns a set of distinct VM name patterns where hostname != VM name.
+func (p *VMPool) GetDistinctVMNamePatternsExtractHostname(filter, prefix, infix, suffix string,
+	hostNameExtractor func(vm *ocatypes.VM) string) map[string]bool {
 
 	var (
-		distinctPatterns = make(map[string]bool, 0)
+		distinctPatterns = make(map[string]bool)
 		pattern          string
 	)
 
 	re := regexp.MustCompile(filter)
 
-	for _, vm := range vmPool.Vms {
+	for _, vm := range p.VMs {
 
 		groups := re.FindStringSubmatch(hostNameExtractor(vm))
 		if groups == nil {
@@ -118,12 +124,13 @@ func (vmPool *VmPool) GetDistinctVmNamePatternsExtractHostname(filter, prefix, i
 	return distinctPatterns
 }
 
-func (vmPool *VmPool) GetVmsByLCMStates(states ...ocatypes.LCMState) (*VmPool, error) {
-	var pool VmPool
-	for _, vm := range vmPool.Vms {
+// GetVMsByLCMStates returns a VM pool based on matching LCM states.
+func (p *VMPool) GetVMsByLCMStates(states ...ocatypes.LCMState) (*VMPool, error) {
+	var pool VMPool
+	for _, vm := range p.VMs {
 		for _, state := range states {
 			if vm.LCMState == state {
-				pool.Vms = append(pool.Vms, vm)
+				pool.VMs = append(pool.VMs, vm)
 				break
 			}
 		}

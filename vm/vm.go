@@ -2,12 +2,14 @@ package vm
 
 import (
 	"encoding/xml"
-	"github.com/marthjod/gocart/ocatypes"
 	"io"
+
+	"github.com/marthjod/gocart/ocatypes"
 )
 
-func FromReader(r io.Reader) (*ocatypes.Vm, error) {
-	v := ocatypes.Vm{}
+// FromReader reads into a VM struct.
+func FromReader(r io.Reader) (*ocatypes.VM, error) {
+	v := ocatypes.VM{}
 	dec := xml.NewDecoder(r)
 	if err := dec.Decode(&v); err != nil {
 		return nil, err

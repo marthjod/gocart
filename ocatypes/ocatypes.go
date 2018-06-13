@@ -171,23 +171,23 @@ var LCMStates = map[string]LCMState{
 	"DiskResizeUndeployed":         DiskResizeUndeployed,
 }
 
-// GetState returns a VM state for a given string
+// GetState returns a VM state for a given string.
 func GetState(state string) State {
 	return States[state]
 }
 
-// GetLCMState returns an LCMState for a given string
+// GetLCMState returns an LCMState for a given string.
 func GetLCMState(state string) LCMState {
 	return LCMStates[state]
 }
 
-// ClusterPool is a list of clusters
+// ClusterPool is a list of clusters.
 type ClusterPool struct {
 	XMLName  xml.Name   `xml:"CLUSTER_POOL"`
 	Clusters []*Cluster `xml:"CLUSTER"`
 }
 
-// Cluster represents a cluster
+// Cluster represents a cluster.
 type Cluster struct {
 	XMLName      xml.Name `xml:"CLUSTER"`
 	Name         string   `xml:"NAME"`
@@ -196,13 +196,13 @@ type Cluster struct {
 	VnetIDs      []int    `xml:"VNETS"`
 }
 
-// DSPool is a list of Datastores
+// DSPool is a list of Datastores.
 type DSPool struct {
 	XMLName    xml.Name     `xml:"DATASTORE_POOL"`
 	Datastores []*Datastore `xml:"DATASTORE"`
 }
 
-// Datastore
+// Datastore represents a datastore.
 type Datastore struct {
 	XMLName   xml.Name `xml:"DATASTORE"`
 	Name      string   `xml:"NAME"`
@@ -211,13 +211,13 @@ type Datastore struct {
 	Cluster   string   `xml:"CLUSTER"`
 }
 
-// VNetPool is a list of Virtual Networks
+// VNetPool is a list of Virtual Networks.
 type VNetPool struct {
 	XMLName  xml.Name `xml:"VNET_POOL"`
 	Networks []*VNet  `xml:"VNET"`
 }
 
-// VNet represents a virtual network
+// VNet represents a virtual network.
 type VNet struct {
 	XMLName   xml.Name `xml:"VNET"`
 	Name      string   `xml:"NAME"`
@@ -227,14 +227,14 @@ type VNet struct {
 	Bridge    string   `xml:"BRIDGE"`
 }
 
-// Disk represents a disk
+// Disk represents a disk.
 type Disk struct {
 	XMLName xml.Name `xml:"DISK"`
 	Name    string   `xml:"IMAGE"`
 	ID      int      `xml:"IMAGE_ID"`
 }
 
-// Image represents an image
+// Image represents an image.
 type Image struct {
 	XMLName     xml.Name `xml:"IMAGE"`
 	ID          int      `xml:"ID"`
@@ -244,75 +244,81 @@ type Image struct {
 	RunningVMs  int      `xml:"RUNNING_VMS"`
 }
 
-// Nic represents an network interface
-type Nic struct {
+// NIC represents a network interface.
+type NIC struct {
 	XMLName   xml.Name `xml:"NIC"`
 	Name      string   `xml:"NETWORK"`
-	NetworkId int      `xml:"NETWORK_ID"`
+	NetworkID int      `xml:"NETWORK_ID"`
 }
 
-// VMTemplatePool is a list of VMTemplates
+// VMTemplatePool is a list of VMTemplates.
 type VMTemplatePool struct {
 	XMLName   xml.Name      `xml:"VMTEMPLATE_POOL"`
-	Templates []*VmTemplate `xml:"VMTEMPLATE"`
+	Templates []*VMTemplate `xml:"VMTEMPLATE"`
 }
 
+// HostTemplate represents a host template.
 type HostTemplate struct {
 	XMLName        xml.Name `xml:"TEMPLATE"`
-	Cpu            string   `xml:"CPU"`
+	CPU            string   `xml:"CPU"`
 	Disk           []Disk   `xml:"DISK"`
 	Memory         string   `xml:"MEMORY"`
 	Name           string   `xml:"NAME"`
-	Nics           []Nic    `xml:"NIC"`
-	VCpu           string   `xml:"VCPU"`
+	Nics           []NIC    `xml:"NIC"`
+	VCPU           string   `xml:"VCPU"`
 	Datacenter     string   `xml:"DATACENTER"`
 	Requirements   string   `xml:"REQUIREMENTS"`
 	DSRequirements string   `xml:"SCHED_DS_REQUIREMENTS"`
 	Items          Tags     `xml:",any"`
 }
 
-type VmTemplate struct {
-	Id       int          `xml:"TEMPLATE_ID"`
+// VMTemplate represents a VM template.
+type VMTemplate struct {
+	ID       int          `xml:"TEMPLATE_ID"`
 	Name     string       `xml:"NAME"`
 	Uname    string       `xml:"UNAME"`
 	RegTime  int          `xml:"REGTIME"`
 	Template HostTemplate `xml:"TEMPLATE"`
 	Memory   int          `xml:"MEMORY"`
-	VmId     int          `xml:"VMID"`
+	VMID     int          `xml:"VMID"`
 	Disk     []Disk       `xml:"DISK"`
-	Cpu      string       `xml:"CPU"`
+	CPU      string       `xml:"CPU"`
 }
 
-// Vm ...
+// VM ...
 // Node (current OpenNebula node the VM is running on) determination is best effort:
 // in case of multiple hosts, this *might* not be 100% reliable, ie. pick the current one,
 // although tests reproducibly showed correct results.
-type Vm struct {
+type VM struct {
 	XMLName      xml.Name     `xml:"VM"`
-	Id           int          `xml:"ID"`
+	ID           int          `xml:"ID"`
 	Name         string       `xml:"NAME"`
-	Cpu          int          `xml:"CPU"`
+	CPU          int          `xml:"CPU"`
 	LastPoll     int          `xml:"LAST_POLL"`
 	State        State        `xml:"STATE"`
 	LCMState     LCMState     `xml:"LCM_STATE"`
 	Resched      int          `xml:"RESCHED"`
-	DeployId     string       `xml:"DEPLOY_ID"`
-	Template     VmTemplate   `xml:"TEMPLATE"`
+	DeployID     string       `xml:"DEPLOY_ID"`
+	Template     VMTemplate   `xml:"TEMPLATE"`
 	UserTemplate UserTemplate `xml:"USER_TEMPLATE"`
 	Node         string       `xml:"HISTORY_RECORDS>HISTORY>HOSTNAME"`
 }
 
+// UserTemplate represents a user template.
 type UserTemplate struct {
 	Items Tags `xml:",any"`
 }
 
+// Tag is an XML tag.
 type Tag struct {
 	XMLName xml.Name
 	Content string `xml:",chardata"`
 }
 
+// Tags is a list of Tags.
 type Tags []Tag
 
+// GetCustom returns values from custom-defined XML tags.
 func (tags Tags) GetCustom(tagName string) (string, error) {
 	for _, tag := range tags {
 		if tagName == tag.XMLName.Local {
@@ -322,22 +328,25 @@ func (tags Tags) GetCustom(tagName string) (string, error) {
 	return "", fmt.Errorf("tag %s not found", tagName)
 }
 
+// Host represents an OpenNebula host.
 type Host struct {
 	XMLName   xml.Name     `xml:"HOST"`
-	Id        int          `xml:"ID"`
+	ID        int          `xml:"ID"`
 	Name      string       `xml:"NAME"`
 	State     int          `xml:"STATE"`
 	Cluster   string       `xml:"CLUSTER"`
-	ClusterId int          `xml:"CLUSTER_ID"`
+	ClusterID int          `xml:"CLUSTER_ID"`
 	Template  HostTemplate `xml:"TEMPLATE"`
-	VmIds     []int        `xml:"VMS>ID"`
+	VMIDs     []int        `xml:"VMS>ID"`
 }
 
+// IsEmpty checks if a host has no VMs.
 func (h *Host) IsEmpty() bool {
-	return len(h.VmIds) == 0
+	return len(h.VMIDs) == 0
 }
 
-type VmPool struct {
+// VMPool represents a VM pool.
+type VMPool struct {
 	XMLName xml.Name `xml:"VM_POOL"`
-	Vms     []Vm     `xml:"VM"` // ?
+	VMs     []VM     `xml:"VM"` // ?
 }
