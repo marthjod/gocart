@@ -283,6 +283,10 @@ type VmTemplate struct {
 	Cpu      string       `xml:"CPU"`
 }
 
+// Vm ...
+// Node (current OpenNebula node the VM is running on) determination is best effort:
+// in case of multiple hosts, this *might* not be 100% reliable, ie. pick the current one,
+// although tests reproducibly showed correct results.
 type Vm struct {
 	XMLName      xml.Name     `xml:"VM"`
 	Id           int          `xml:"ID"`
@@ -295,6 +299,7 @@ type Vm struct {
 	DeployId     string       `xml:"DEPLOY_ID"`
 	Template     VmTemplate   `xml:"TEMPLATE"`
 	UserTemplate UserTemplate `xml:"USER_TEMPLATE"`
+	Node         string       `xml:"HISTORY_RECORDS>HISTORY>HOSTNAME"`
 }
 
 type UserTemplate struct {
