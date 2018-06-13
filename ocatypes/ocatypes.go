@@ -5,8 +5,25 @@ import (
 	"fmt"
 )
 
+// State represents VM state
+type State int
+
 // LCMState represents LCM (lifecycle manager) state
 type LCMState int
+
+//go:generate stringer -type=State
+const (
+	Init       State = iota
+	Pending    State = iota
+	Hold       State = iota
+	Active     State = iota
+	Stopped    State = iota
+	Suspended  State = iota
+	Done       State = iota
+	Failed     State = iota
+	Poweroff   State = iota
+	Undeployed State = iota
+)
 
 //go:generate stringer -type=LCMState
 const (
@@ -74,6 +91,20 @@ const (
 	DiskResizeUndeployed         LCMState = iota
 )
 
+// States maps VM state names to their constant State values.
+var States = map[string]State{
+	"Init":       Init,
+	"Pending":    Pending,
+	"Hold":       Hold,
+	"Active":     Active,
+	"Stopped":    Stopped,
+	"Suspended":  Suspended,
+	"Done":       Done,
+	"Failed":     Failed,
+	"Poweroff":   Poweroff,
+	"Undeployed": Undeployed,
+}
+
 // LCMStates maps LCM state names to their constant LCMState values.
 var LCMStates = map[string]LCMState{
 	"LcmInit":                      LcmInit,
@@ -138,6 +169,11 @@ var LCMStates = map[string]LCMState{
 	"DiskResize":                   DiskResize,
 	"DiskResizePoweroff":           DiskResizePoweroff,
 	"DiskResizeUndeployed":         DiskResizeUndeployed,
+}
+
+// GetState returns a VM state for a given string
+func GetState(state string) State {
+	return States[state]
 }
 
 // GetLCMState returns an LCMState for a given string
@@ -253,6 +289,7 @@ type Vm struct {
 	Name         string       `xml:"NAME"`
 	Cpu          int          `xml:"CPU"`
 	LastPoll     int          `xml:"LAST_POLL"`
+	State        State        `xml:"STATE"`
 	LCMState     LCMState     `xml:"LCM_STATE"`
 	Resched      int          `xml:"RESCHED"`
 	DeployId     string       `xml:"DEPLOY_ID"`
