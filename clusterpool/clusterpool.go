@@ -7,7 +7,7 @@ import (
 	"github.com/marthjod/gocart/ocatypes"
 )
 
-// ImagePool is a list of VMTemplates
+// ClusterPool is a list of VMTemplates
 type ClusterPool struct {
 	XMLName  xml.Name            `xml:"CLUSTER_POOL"`
 	Clusters []*ocatypes.Cluster `xml:"CLUSTER"`
@@ -64,4 +64,14 @@ func (vt *ClusterPool) GetIDByName(name string) (i int, err error) {
 		}
 	}
 	return -1, fmt.Errorf("could not find cluster with name %s", name)
+}
+
+// GetNameByID returns Name of Cluster if exits
+func (vt *ClusterPool) GetNameByID(id int) (name string, err error) {
+	for _, cl := range vt.Clusters {
+		if cl.ID == id {
+			return cl.Name, nil
+		}
+	}
+	return "", fmt.Errorf("could not find cluster with id %d", id)
 }

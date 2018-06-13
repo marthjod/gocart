@@ -3,8 +3,9 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/kolo/xmlrpc"
+	"github.com/bogue1979/xmlrpc"
 )
 
 type XMLRPCEndpointer interface {
@@ -19,8 +20,9 @@ type Rpc struct {
 	AuthString string
 }
 
-func NewClient(url, user, password string, transport http.RoundTripper) (*Rpc, error) {
-	client, err := xmlrpc.NewClient(url, transport)
+// NewClient creates a RPC connection
+func NewClient(url, user, password string, transport http.RoundTripper, timeout time.Duration) (*Rpc, error) {
+	client, err := xmlrpc.NewClient(url, transport, timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +37,7 @@ func newClient(url, user, password string, client *xmlrpc.Client) (*Rpc, error) 
 	}, nil
 }
 
+// Call the endpoint
 func (c *Rpc) Call(endpoint XMLRPCEndpointer) error {
 	args := endpoint.ApiArgs(c.AuthString)
 	method := endpoint.ApiMethod()
