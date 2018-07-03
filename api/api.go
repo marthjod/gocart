@@ -54,8 +54,14 @@ func (c *RPC) Call(endpoint XMLRPCEndpointer) error {
 		return fmt.Errorf("malformed XMLRPC response")
 	}
 	if !apiCallSucceeded {
-		// panic: interface conversion: interface is bool, not string
-		return fmt.Errorf("API call against %s unsuccessful", c.URL)
+		switch e := result[1].(type) {
+		case int64:
+			return fmt.Errorf("API call against %s unsuccessful, error code %d", c.URL, e)
+		case string:
+			return fmt.Errorf("API call against %s unsuccessful, %s", c.URL, e)
+		default:
+			return fmt.Errorf("API call against %s unsuccessful", c.URL)
+		}
 	}
 	if w, ok := result[1].(string); ok {
 		endpoint.Unmarshal([]byte(w))
