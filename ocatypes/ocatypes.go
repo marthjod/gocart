@@ -274,7 +274,7 @@ type HostTemplate struct {
 
 // VMTemplate represents a VM template.
 type VMTemplate struct {
-	ID       int          `xml:"TEMPLATE_ID"`
+	ID       int          `xml:"ID"`
 	Name     string       `xml:"NAME"`
 	Uname    string       `xml:"UNAME"`
 	RegTime  int          `xml:"REGTIME"`
