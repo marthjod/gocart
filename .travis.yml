@@ -2,11 +2,11 @@ language: go
 
 before_install:
   - go get -u github.com/marthjod/gocart/...
-  - go get -u golang.org/x/lint/golint
-  - go get -u honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/golang/lint/golint
+  - go get -u github.com/dominikh/go-tools/staticcheck
 
 script:
   - make vet
   - make lint
-  - make megacheck
+  - make staticcheck
   - make test
