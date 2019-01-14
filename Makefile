@@ -1,7 +1,7 @@
 PACKAGES ?= $(shell go list ./... | grep -v /vendor/ | grep -v /tests)
 
 .PHONY: all
-all: vet lint megacheck test
+all: vet lint staticcheck test
 
 .PHONY: vet
 vet:
@@ -11,9 +11,9 @@ vet:
 lint:
 	STATUS=0; for PKG in $(PACKAGES); do golint -set_exit_status $$PKG || STATUS=1; done; exit $$STATUS
 
-.PHONY: megacheck
-megacheck:
-	STATUS=0; for PKG in $(PACKAGES); do CGO_ENABLED=0 megacheck $$PKG || STATUS=1; done; exit $$STATUS
+.PHONY: staticcheck
+staticcheck:
+	STATUS=0; for PKG in $(PACKAGES); do CGO_ENABLED=0 staticcheck $$PKG || STATUS=1; done; exit $$STATUS
 
 .PHONY: test
 test:
