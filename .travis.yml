@@ -3,7 +3,7 @@ language: go
 before_install:
   - go get -u github.com/marthjod/gocart/...
   - go get -u github.com/golang/lint/golint
-  - go get -u github.com/dominikh/go-tools/staticcheck
+  - go get -u honnef.co/go/tools/staticcheck
 
 script:
   - make vet
